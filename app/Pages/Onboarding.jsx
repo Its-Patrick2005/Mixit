@@ -56,7 +56,9 @@ const Onboarding = () => {
       />
       <View className="mt-4 flex-row">
         <Text className="text-xl">Already have an account?</Text>
-        <TouchableOpacity className="">
+        <TouchableOpacity
+          className=""
+          onPress={() => navigation.navigate("Login2")}>
           <Text className="text-[#008000] text-xl"> Log in</Text>
         </TouchableOpacity>
       </View>
@@ -360,6 +362,8 @@ export const Onboard3 = () => {
   );
 };
 
+// fourth login page
+
 export const Onboard4 = () => {
   const [continueButtonVisible, setContinueButtonVisible] = useState(false);
   const spinValue = new Animated.Value(0);
@@ -443,7 +447,7 @@ export const Onboard4 = () => {
       {continueButtonVisible && (
         <Button
           title="Continue"
-          onPress={() => navigation.navigate("Onboard")}
+          onPress={() => navigation.navigate("LoginPage")}
         />
       )}
     </View>
