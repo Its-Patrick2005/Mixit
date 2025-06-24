@@ -29,8 +29,9 @@ const Login = () => {
         className="rounded-full overflow-hidden"
         style={{ width: "40%", aspectRatio: 1, alignSelf: "center" }}>
         <Image
-          source={require("../../assets/images/Logo.png")}
+          source={require("../../assets/images/Asset 4.png")}
           className="w-full h-full object-cover"
+          resizeMode="contain"
         />
       </View>
 
@@ -201,8 +202,9 @@ export const Login1 = () => {
         className="rounded-full overflow-hidden"
         style={{ width: "30%", aspectRatio: 1, alignSelf: "center" }}>
         <Image
-          source={require("../../assets/images/Logo.png")}
+          source={require("../../assets/images/Asset 4.png")}
           className="w-full h-full object-cover"
+          resizeMode="contain"
         />
       </View>
       {/* Pass setOtp to OTPverification so it can update otp state */}
@@ -277,8 +279,9 @@ export const Login2 = () => {
         className="rounded-full overflow-hidden"
         style={{ width: "30%", aspectRatio: 1, alignSelf: "center" }}>
         <Image
-          source={require("../../assets/images/Logo.png")}
+          source={require("../../assets/images/Asset 4.png")}
           className="w-full h-full object-cover"
+          resizeMode="contain"
         />
       </View>
 
