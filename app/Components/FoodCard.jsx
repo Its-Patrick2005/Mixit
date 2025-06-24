@@ -1,15 +1,14 @@
+import AntDesign from "@expo/vector-icons/AntDesign";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import React from "react";
 import {
- 
-  Image,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
+    Image,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import FoodData from "../FoodData";
-import AntDesign from "@expo/vector-icons/AntDesign";
 
 const meals = {
   breakfast: {
@@ -44,7 +43,7 @@ const FoodCard = ({ name, image }) => {
           mealName: name.toLowerCase(),
         })
       }
-      className="flex flex-col items-center mb-2"
+      className="flex flex-col items-center mb-2 ml-2"
     >
       <View
         style={{
@@ -271,11 +270,7 @@ export const Detailedfoodlist = () => {
 };
 
 // --------------------- Grid Layout Addable Card ------------------------
-
-
-
-
-export const FoodCard3 = ({ cardName, image = [], text, onPress }) => {
+export const FoodCard3 = ({ cardName, image = [], text, onPress, onLongPress }) => {
   return (
     <View className="bg-[#D9ECD9] flex-1 px-4 pt-10">
       <TouchableOpacity
@@ -283,6 +278,7 @@ export const FoodCard3 = ({ cardName, image = [], text, onPress }) => {
         style={{ width: 180, height: 150 }}
         activeOpacity={0.9}
         onPress={onPress}
+        onLongPress={onLongPress}
       >
         {/* Image Grid */}
         <View className="flex-row flex-1">

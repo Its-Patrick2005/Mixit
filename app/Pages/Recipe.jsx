@@ -1,15 +1,17 @@
-import React, { useState } from "react";
-import {
-  View,
-  TouchableOpacity,
-  Text,
-  ScrollView,
-  Modal,
-  TextInput,
-  Image,
-} from "react-native";
+import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import React, { useState } from "react";
+import {
+  Alert,
+  Image,
+  Modal,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { FoodCard3 } from "../Components/FoodCard";
 import foodList from "../FoodData";
 
@@ -48,6 +50,18 @@ const Recipe = () => {
     setModalVisible(false);
   };
 
+  const handleDeleteCookbook = (index) => {
+    setCookbooks((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleDeleteRecipe = (cookbookIndex, recipeIndex) => {
+    setCookbooks((prev) => {
+      const updated = [...prev];
+      updated[cookbookIndex].recipes = updated[cookbookIndex].recipes.filter((_, i) => i !== recipeIndex);
+      return updated;
+    });
+  };
+
   // Group cookbooks into rows of two
   const groupedCookbooks = [];
   for (let i = 0; i < cookbooks.length; i += 2) {
@@ -55,14 +69,16 @@ const Recipe = () => {
   }
 
   return (
-    <ScrollView className="bg-[#D9ECD9] pt-10 px-3" contentContainerStyle={{ paddingBottom: 50 }}>
+    <ScrollView
+      className="bg-[#D9ECD9] pt-10 px-3"
+      contentContainerStyle={{ paddingBottom: 50 }}>
       {/* Cookbooks Grid in Rows of 2 */}
       {groupedCookbooks.map((row, rowIndex) => (
-        <View key={rowIndex} className="flex-row justify-between mb-6">
+        <View key={rowIndex} className="flex-row justify-between ">
           {row.map((cookbook, index) => {
             const realIndex = rowIndex * 2 + index;
             return (
-              <View key={realIndex} className="relative w-[48%]">
+              <View key={realIndex} className="relative w-[48%] mb-4">
                 <FoodCard3
                   cardName={cookbook.title}
                   text={`${cookbook.recipes.length} Recipes`}
@@ -71,16 +87,28 @@ const Recipe = () => {
                     navigation.navigate("Recipe3", {
                       recipes: cookbook.recipes,
                       cookbookTitle: cookbook.title,
+                      cookbookIndex: realIndex,
+                      setCookbooks,
+                      cookbooks,
                     })
                   }
+                  onLongPress={() => {
+                    Alert.alert(
+                      'Delete Cookbook',
+                      `Are you sure you want to delete "${cookbook.title}"?`,
+                      [
+                        { text: 'Cancel', style: 'cancel' },
+                        { text: 'Delete', style: 'destructive', onPress: () => handleDeleteCookbook(realIndex) },
+                      ]
+                    );
+                  }}
                 />
                 <TouchableOpacity
-                  className="absolute -top-2 -right-2 z-10 bg-white rounded-full p-1 border border-[#003A00]"
+                  className="absolute -top-2 left-2 z-10 bg-white rounded-full p-1 border border-[#003A00]"
                   onPress={() => {
                     setActiveCookbookIndex(realIndex);
                     setModalVisible(true);
-                  }}
-                >
+                  }}>
                   <Ionicons name="add" size={20} color="#003A00" />
                 </TouchableOpacity>
               </View>
@@ -92,10 +120,11 @@ const Recipe = () => {
       {/* Create New Cookbook */}
       <TouchableOpacity
         className="bg-[#D9ECD9] py-10 w-[40%] px-4 rounded-xl mt-4 ml-2 mb-10 border-2 border-[#003A00] items-center"
-        onPress={handleCreateCookbook}
-      >
+        onPress={handleCreateCookbook}>
         <Ionicons name="add-circle-outline" size={24} color="#003A00" />
-        <Text className="text-[#003A00] font-semibold text-center">Create Cookbook</Text>
+        <Text className="text-[#003A00] font-semibold text-center">
+          Create Cookbook
+        </Text>
       </TouchableOpacity>
 
       {/* Add Recipe Modal */}
@@ -135,7 +164,9 @@ export const Recipe2 = ({ visible, onClose, onAddRecipe }) => {
             onChangeText={setQuery}
             className="border mb-4 p-2 rounded"
           />
-          <TouchableOpacity className="bg-green-700 p-3 rounded mb-2" onPress={handleSubmit}>
+          <TouchableOpacity
+            className="bg-green-700 p-3 rounded mb-2"
+            onPress={handleSubmit}>
             <Text className="text-white text-center">Add</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={onClose}>
@@ -150,21 +181,63 @@ export const Recipe2 = ({ visible, onClose, onAddRecipe }) => {
 // ============ Recipe3 ============
 export const Recipe3 = () => {
   const route = useRoute();
-  const { recipes = [], cookbookTitle = "My Cookbook" } = route.params;
+  const navigation = useNavigation();
+  const { recipes = [], cookbookTitle = "My Cookbook", cookbookIndex, setCookbooks } = route.params;
+
+  // Helper to delete a recipe with confirmation
+  const confirmDeleteRecipe = (idx) => {
+    Alert.alert(
+      'Delete Recipe',
+      `Are you sure you want to delete "${recipes[idx]?.name}" from this cookbook?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Delete', style: 'destructive', onPress: () => {
+          if (typeof cookbookIndex === 'number' && typeof setCookbooks === 'function') {
+            setCookbooks((prev) => {
+              const updated = [...prev];
+              updated[cookbookIndex].recipes = updated[cookbookIndex].recipes.filter((_, i) => i !== idx);
+              return updated;
+            });
+            navigation.goBack();
+          }
+        } },
+      ]
+    );
+  };
 
   return (
     <ScrollView className="bg-[#D9ECD9] pt-10 px-4">
-      <Text className="text-2xl font-bold mb-4 text-[#003A00]">{cookbookTitle}</Text>
-      {recipes.map((recipe, idx) => (
-        <View key={idx} className="bg-white mb-4 p-4 rounded-xl border border-[#003A00]">
-          <Image
-            source={{ uri: recipe.image }}
-            className="w-full h-40 rounded-lg mb-2"
-            resizeMode="cover"
-          />
-          <Text className="text-[#003A00] font-semibold">{recipe.name}</Text>
-        </View>
-      ))}
+      <TouchableOpacity
+        onPress={() => navigation.goBack()}
+        className="flex-row items-center mb-4 ">
+        <AntDesign name="left" size={24} color="#008000" />
+        <Text style={{ fontSize: 18, color: "#008000" }}>Back</Text>
+      </TouchableOpacity>
+      <Text className="text-2xl font-bold mb-4 text-[#003A00]">
+        {cookbookTitle}
+      </Text>
+      {recipes.map((recipe, idx) => {
+        const fullData = foodList.find(
+          (item) => item.name.toLowerCase() === recipe.name.toLowerCase()
+        );
+        if (!fullData) return null;
+        return (
+          <TouchableOpacity
+            key={idx}
+            onPress={() => navigation.navigate("MealCard", { food: fullData })}
+            onLongPress={() => confirmDeleteRecipe(idx)}
+            className="bg-white mb-4 rounded-xl border border-[#003A00]">
+            <Image
+              source={{ uri: fullData.image }}
+              className="w-full h-40 rounded-lg mb-1"
+              resizeMode="cover"
+            />
+            <Text className="text-[#003A00] font-semibold text-xl px-2 pb-2">
+              {fullData.name}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
     </ScrollView>
   );
 };

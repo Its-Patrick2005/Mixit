@@ -1,13 +1,13 @@
+import AntDesign from '@expo/vector-icons/AntDesign';
 import React from "react";
 import {
   Dimensions,
   Image,
+  ScrollView,
   Text,
   TouchableOpacity,
   View,
-  ScrollView,
 } from "react-native";
-import AntDesign from '@expo/vector-icons/AntDesign';
 
 
 const MealCard = ({ route, navigation }) => {

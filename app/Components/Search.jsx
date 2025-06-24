@@ -52,7 +52,7 @@ const Search = () => {
             <TouchableOpacity
               key={food.id}
               className="bg-white border border-[#003A00] rounded-lg p-4 mb-4 mx-4"
-              onPress={() => navigation.navigate("Detailedfoodlist", { food })}
+              onPress={() => navigation.navigate("MealCard", { food })}
             >
               <View className="flex-row items-center">
                 <Image
