@@ -16,6 +16,8 @@ import RecipePage from "./Pages/RecipePage";
 import SettingsPage from "./Pages/SettingsPage";
 import { Detailedfoodlist } from "./Components/FoodCard";
 import MealCard from "./Components/MealCard";
+import { Recipe2,Recipe3 } from "./Pages/Recipe";
+import Sidebar from "./Components/Sidebar"
 
 const Stack = createNativeStackNavigator();
 
@@ -43,6 +45,12 @@ export default function Index() {
       <Stack.Screen name="Login2" component={Login2} />
       <Stack.Screen name="Detailedfoodlist" component={Detailedfoodlist} />
       <Stack.Screen name="MealCard" component={MealCard} />
+      <Stack.Screen name="Recipe2" component={Recipe2}/>
+      <Stack.Screen name="Recipe3" component={Recipe3} />
+       <Stack.Screen name="Sidebar" component={Sidebar} />
+       
+
+
     </Stack.Navigator>
   );
 }

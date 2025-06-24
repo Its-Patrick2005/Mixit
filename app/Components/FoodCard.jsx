@@ -222,7 +222,9 @@ export const Detailedfoodlist = () => {
                 alignItems: "center",
               }}
             >
-              <View
+              <TouchableOpacity
+                onPress={() => navigation.navigate("MealCard", { food })}>
+                <View
                 style={{
                   width: "100%",
                   aspectRatio: 1,
@@ -238,6 +240,7 @@ export const Detailedfoodlist = () => {
                   resizeMode="cover"
                 />
               </View>
+              </TouchableOpacity>
               <Text
                 style={{
                   fontSize: 18,
@@ -272,54 +275,61 @@ export const Detailedfoodlist = () => {
 
 
 
-export const FoodCard3 = ({cardName, image,text}) => {
+export const FoodCard3 = ({ cardName, image = [], text, onPress }) => {
   return (
     <View className="bg-[#D9ECD9] flex-1 px-4 pt-10">
       <TouchableOpacity
-        className=" rounded-xl border border-[#003A00] p-1"
-        style={{ width: 180, height: 150 }} // compact card size
+        className="rounded-xl border border-[#003A00] p-1"
+        style={{ width: 180, height: 150 }}
         activeOpacity={0.9}
+        onPress={onPress}
       >
         {/* Image Grid */}
         <View className="flex-row flex-1">
           {/* Left Large Image */}
           <View className="w-[50%] mr-1 bg-gray-200 rounded-lg overflow-hidden">
-            <Image
-              source={{
-                uri: "https://cdn.loveandlemons.com/wp-content/uploads/2019/09/dinner-ideas-2.jpg",
-              }}
-              className="w-full h-full"
-              resizeMode="cover"
-            />
+            {image[0] ? (
+              <Image
+                source={{ uri: image[0] }}
+                className="w-full h-full"
+                resizeMode="cover"
+              />
+            ) : (
+              <View className="w-full h-full bg-gray-300" />
+            )}
           </View>
 
           {/* Right Stacked Images */}
           <View className="w-[48%] justify-between">
             <View className="h-[48%] bg-gray-200 rounded-lg overflow-hidden mb-1">
-              <Image
-                source={{
-                  uri: "https://img.hellofresh.com/f_auto,fl_lossy,q_auto,w_1200/hellofresh_s3/image/HF_Y23_M_W27_UK_03_3_low-6510a59e.jpg",
-                }}
-                className="w-full h-full"
-                resizeMode="cover"
-              />
+              {image[1] ? (
+                <Image
+                  source={{ uri: image[1] }}
+                  className="w-full h-full"
+                  resizeMode="cover"
+                />
+              ) : (
+                <View className="w-full h-full bg-gray-300" />
+              )}
             </View>
             <View className="h-[48%] bg-gray-200 rounded-lg overflow-hidden">
-              <Image
-                source={{
-                  uri: "https://img.hellofresh.com/f_auto,fl_lossy,q_auto,w_1200/hellofresh_s3/image/italian-sunday-supper-0dda667a.jpg",
-                }}
-                className="w-full h-full"
-                resizeMode="cover"
-              />
+              {image[2] ? (
+                <Image
+                  source={{ uri: image[2] }}
+                  className="w-full h-full"
+                  resizeMode="cover"
+                />
+              ) : (
+                <View className="w-full h-full bg-gray-300" />
+              )}
             </View>
           </View>
         </View>
 
         {/* Footer Text */}
         <View className="mt-2">
-          <Text className="text-base font-semibold text-black">Dinner</Text>
-          <Text className="text-xs text-gray-700">19 Recipes</Text>
+          <Text className="text-base font-semibold text-black">{cardName || "Cookbook"}</Text>
+          <Text className="text-xs text-gray-700">{text || "0 Recipes"}</Text>
         </View>
       </TouchableOpacity>
     </View>

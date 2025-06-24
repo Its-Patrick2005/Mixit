@@ -3,12 +3,17 @@ import { Text, View } from "react-native";
 import FoodCards, { FoodCard2 } from "../Components/FoodCard";
 import Navbar from "../Components/Navbar";
 import ImportTab from "../Components/ImportTab";
+import Search from "../Components/Search";
 
 const Home = () => {
   return (
     <View className="bg-[#D9ECD9] flex-1">
       <View className="mb-4">
         <Navbar />
+      </View>
+
+      <View className="mb-4">
+        <Search />
       </View>
       <View>
         <FoodCards />

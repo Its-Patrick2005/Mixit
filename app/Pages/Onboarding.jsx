@@ -28,8 +28,9 @@ const Onboarding = () => {
         className="rounded-full overflow-hidden"
         style={{ width: "30%", aspectRatio: 1, alignSelf: "center" }}>
         <Image
-          source={require("../../assets/images/Logo.png")}
+          source={require("../../assets/images/Asset 4.png")}
           className="w-full h-full object-cover"
+          resizeMode="contain"
         />
       </View>
 
@@ -139,8 +140,9 @@ export const Onboard1 = () => {
           className="rounded-full overflow-hidden"
           style={{ width: "30%", aspectRatio: 1, alignSelf: "center" }}>
           <Image
-            source={require("../../assets/images/Logo.png")}
+            source={require("../../assets/images/Asset 4.png")}
             className="w-full h-full object-cover"
+            resizeMode="contain"
           />
         </View>
         <View className="bg-white w-80 h-3 relative rounded-[30px] overflow-hidden mt-3">
@@ -234,8 +236,9 @@ export const Onboard2 = () => {
           className="rounded-full overflow-hidden"
           style={{ width: "30%", aspectRatio: 1, alignSelf: "center" }}>
           <Image
-            source={require("../../assets/images/Logo.png")}
+            source={require("../../assets/images/Asset 4.png")}
             className="w-full h-full object-cover"
+            resizeMode="contain"
           />
         </View>
         <View className="bg-white w-80 h-3 relative rounded-[30px] overflow-hidden mt-3">
@@ -320,8 +323,9 @@ export const Onboard3 = () => {
           className="rounded-full overflow-hidden"
           style={{ width: "30%", aspectRatio: 1, alignSelf: "center" }}>
           <Image
-            source={require("../../assets/images/Logo.png")}
+            source={require("../../assets/images/Asset 4.png")}
             className="w-full h-full object-cover"
+            resizeMode="contain"
           />
         </View>
         <View className="bg-white w-80 h-3 relative rounded-[30px] overflow-hidden mt-3">
@@ -397,8 +401,9 @@ export const Onboard4 = () => {
           className="rounded-full overflow-hidden"
           style={{ width: "30%", aspectRatio: 1, alignSelf: "center" }}>
           <Image
-            source={require("../../assets/images/Logo.png")}
+            source={require("../../assets/images/Asset 4.png")}
             className="w-full h-full object-cover"
+            resizeMode="contain"
           />
         </View>
         <View className="bg-white w-80 h-3 relative rounded-[30px] overflow-hidden mt-3">
@@ -429,8 +434,9 @@ export const Onboard4 = () => {
           ],
         }}>
         <Image
-          source={require("../../assets/images/Logo.png")}
+          source={require("../../assets/images/Asset 4.png")}
           style={{ width: 300, height: 300 }}
+          resizeMode="contain"
         />
       </Animated.View>
 
