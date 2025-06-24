@@ -1,12 +1,9 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import React from "react";
 
-const LoginPage = ({navigation}) => {
-  return (
-    <View>
-      <Text>LoginPage</Text>
-    </View>
-  )
-}
+import Login from "./Login";
 
-export default LoginPage
+const LoginPage = ({ navigation }) => {
+  return <Login />;
+};
+
+export default LoginPage;

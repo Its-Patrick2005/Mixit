@@ -1,8 +1,8 @@
 import React from "react";
 import Onboarding from "./Onboarding";
 
-const Onboardpage = ({ navigation }) => {
+const OnboardPage = ({ navigation }) => {
   return <Onboarding />;
 };
 
-export default Onboardpage;
+export default OnboardPage;

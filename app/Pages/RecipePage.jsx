@@ -1,12 +1,19 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import React from "react";
+import { View } from "react-native";
+import Navbar from "../Components/Navbar";
+import Search from "../Components/Search";
+import Recipe from "../Pages/Recipe";
 
-const RecipePage = ({navigation}) => {
+const RecipePage = ({ navigation }) => {
   return (
-    <View>
-      <Text>RecipePage</Text>
-    </View>
-  )
-}
+    <View className="bg-[#D9ECD9] flex-1 relative">
+      <Navbar />
 
-export default RecipePage
+      <Search />
+
+      <Recipe />
+    </View>
+  );
+};
+
+export default RecipePage;

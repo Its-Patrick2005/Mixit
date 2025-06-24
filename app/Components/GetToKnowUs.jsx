@@ -54,6 +54,7 @@ const GetToKnowUs = ({ name, icon, selectedOptions, setSelectedOptions }) => {
           fontSize: 16,
           fontWeight: "600",
           color: isPressed || isActive ? "#fff" : "#222",
+        
         }}>
         {name}
       </Text>
