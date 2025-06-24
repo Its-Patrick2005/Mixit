@@ -10,7 +10,7 @@ const RecipePage = ({ navigation }) => {
     <View className="bg-[#D9ECD9] flex-1 relative">
       <Navbar />
 
-      <Search />
+      {/* <Search /> */}
 
       <Recipe />
 

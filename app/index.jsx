@@ -28,9 +28,9 @@ export default function Index() {
         headerShown: false,
         animation: "fade", // Use fade animation for screen transitions
       }}>
+      <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="Onboard" component={OnboardPage} />
       <Stack.Screen name="LoginPage" component={LoginPage} />
-      <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="Groceries" component={GroceriesPage} />
       <Stack.Screen name="MealPlan" component={MealPlanPage} />
       <Stack.Screen name="Recipe" component={RecipePage} />

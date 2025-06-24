@@ -13,15 +13,15 @@ const ImportTab = () => {
         <Foundation name="home" size={30} color="#003A00" />
         <Text className="text-sm mt-2 text-[#003A00]">Home</Text>
       </TouchableOpacity>
-      <TouchableOpacity className="items-center" onPress={() => navigation.navigate("Recipe")}>
+      <TouchableOpacity className="items-center mr-4" onPress={() => navigation.navigate("Recipe")}>
         <Ionicons name="receipt-outline" size={30} color="#003A00" />
         <Text className="text-sm mt-2 text-[#003A00]">Receipts</Text>
       </TouchableOpacity>
-      <TouchableOpacity className="items-center absolute -top-8 left-[55%] transform -translate-x-[50%]" >
+      <TouchableOpacity className="items-center absolute  -top-8 left-[55%] transform -translate-x-[50%]" >
         <Ionicons name="add-circle-sharp" size={70} color="#003A00" />
         <Text className="text-sm  text-[#003A00]">Add</Text>
       </TouchableOpacity>
-      <TouchableOpacity className="items-center" onPress={() => navigation.navigate("MealPlan")}>
+      <TouchableOpacity className="items-center ml-4" onPress={() => navigation.navigate("MealPlan")}>
         <MaterialIcons name="schedule" size={30} color="#003A00" />
         <Text className="text-sm mt-2 text-[#003A00]">Schedule</Text>
       </TouchableOpacity>
