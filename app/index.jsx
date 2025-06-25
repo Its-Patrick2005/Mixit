@@ -1,5 +1,8 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React from "react";
+import { Detailedfoodlist } from "./Components/FoodCard";
+import MealCard from "./Components/MealCard";
+import Sidebar from "./Components/Sidebar";
 import GroceriesPage from "./Pages/GroceriesPage";
 import Home from "./Pages/Home";
 import Login, { Login1, Login2 } from "./Pages/Login";
@@ -12,12 +15,9 @@ import Onboarding, {
   Onboard4,
 } from "./Pages/Onboarding";
 import OnboardPage from "./Pages/Onboardpage";
+import { Recipe2, Recipe3 } from "./Pages/Recipe";
 import RecipePage from "./Pages/RecipePage";
 import SettingsPage from "./Pages/SettingsPage";
-import { Detailedfoodlist } from "./Components/FoodCard";
-import MealCard from "./Components/MealCard";
-import { Recipe2,Recipe3 } from "./Pages/Recipe";
-import Sidebar from "./Components/Sidebar"
 
 const Stack = createNativeStackNavigator();
 
@@ -26,10 +26,29 @@ export default function Index() {
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
-        animation: "fade", // Use fade animation for screen transitions
+        animation: "fade",
+        animationDuration: 200,
+        gestureEnabled: true,
+        gestureDirection: "horizontal",
+        // Performance optimizations
+        lazy: true,
+        lazyPlaceholder: () => null,
+        // Reduce memory usage
+        unmountOnBlur: false,
+        // Optimize transitions
+        transitionSpec: {
+          open: {
+            animation: 'timing',
+            config: { duration: 200 }
+          },
+          close: {
+            animation: 'timing',
+            config: { duration: 200 }
+          }
+        }
       }}>
-      <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="Onboard" component={OnboardPage} />
+      <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="LoginPage" component={LoginPage} />
       <Stack.Screen name="Groceries" component={GroceriesPage} />
       <Stack.Screen name="MealPlan" component={MealPlanPage} />
@@ -47,10 +66,7 @@ export default function Index() {
       <Stack.Screen name="MealCard" component={MealCard} />
       <Stack.Screen name="Recipe2" component={Recipe2}/>
       <Stack.Screen name="Recipe3" component={Recipe3} />
-       <Stack.Screen name="Sidebar" component={Sidebar} />
-       
-
-
+      <Stack.Screen name="Sidebar" component={Sidebar} />
     </Stack.Navigator>
   );
 }
