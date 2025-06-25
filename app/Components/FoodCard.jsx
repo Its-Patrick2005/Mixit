@@ -1,12 +1,12 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import {
-    Image,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import FoodData from "../FoodData";
 
@@ -50,9 +50,14 @@ const FoodCard = ({ name, image }) => {
           width: 80,
           height: 80,
           borderRadius: 50,
-          borderWidth: 1,
-          borderColor: "#003A00",
           overflow: "hidden",
+          shadowColor: "#003A00",
+          shadowOffset: { width: 0, height: 8 },
+          shadowOpacity: 0.3,
+          shadowRadius: 12,
+          elevation: 12,
+          marginBottom: 6,
+          backgroundColor: "#fff",
         }}
       >
         <Image
@@ -62,11 +67,11 @@ const FoodCard = ({ name, image }) => {
       </View>
       <Text
         style={{
-          fontSize: 16,
+          fontSize: 14,
           fontWeight: "600",
           color: "#003A00",
-          marginTop: 6,
           textAlign: "center",
+          lineHeight: 18,
         }}
       >
         {name}
@@ -93,16 +98,127 @@ const FoodCards = () => (
 );
 
 // --------------------- Grid of Food Images ------------------------
-export const FoodCard2 = () => {
+export const FoodCard2 = React.memo(() => {
   const navigation = useNavigation();
+  
+  const handleFoodPress = useCallback((food) => {
+    navigation.navigate("MealCard", { 
+      food: {
+        id: food.id,
+        name: food.name,
+        image: food.image,
+        rating: food.rating,
+        ingredients: food.ingredients,
+        method: food.method,
+        funFact: food.funFact
+      }
+    });
+  }, [navigation]);
+
+  const foodCards = useMemo(() => {
+    return FoodData.map((food) => (
+      <TouchableOpacity
+        key={food.id}
+        onPress={() => handleFoodPress(food)}
+        style={{
+          width: "48%",
+          marginBottom: 16,
+          alignItems: "center",
+        }}
+      >
+        <View
+          style={{
+            width: "100%",
+            aspectRatio: 1,
+            borderRadius: 20,
+            overflow: "hidden",
+            backgroundColor: "#fff",
+            shadowColor: "#003A00",
+            shadowOffset: { width: 0, height: 10 },
+            shadowOpacity: 0.35,
+            shadowRadius: 15,
+            elevation: 15,
+            borderWidth: 1,
+            borderColor: "#003A00",
+          }}
+        >
+          <Image
+            source={{ uri: food.image }}
+            style={{ width: "100%", height: "100%", resizeMode: "cover" }}
+          />
+          
+          {/* Gradient overlay for better text readability */}
+          <View
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: "40%",
+              backgroundColor: "rgba(0, 58, 0, 0.4)",
+            }}
+          />
+          
+          {/* Rating badge */}
+          <View
+            style={{
+              position: "absolute",
+              top: 8,
+              right: 8,
+              backgroundColor: "rgba(255, 255, 255, 0.9)",
+              paddingHorizontal: 8,
+              paddingVertical: 4,
+              borderRadius: 12,
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <Text style={{ fontSize: 12, fontWeight: "bold", color: "#003A00" }}>
+              ⭐ {food.rating}
+            </Text>
+          </View>
+          
+          {/* Food name overlay */}
+          <View
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              padding: 12,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 14,
+                fontWeight: "bold",
+                color: "#ffffff",
+                textShadowColor: "rgba(0, 0, 0, 0.8)",
+                textShadowOffset: { width: 1, height: 1 },
+                textShadowRadius: 2,
+                lineHeight: 18,
+              }}
+            >
+              {food.name}
+            </Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+    ));
+  }, [handleFoodPress]);
+
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{
-        paddingHorizontal: 8,
+        paddingHorizontal: 12,
         paddingTop: 10,
         paddingBottom: 30,
       }}
+      removeClippedSubviews={true}
+      maxToRenderPerBatch={10}
+      windowSize={10}
+      initialNumToRender={6}
     >
       <View
         style={{
@@ -111,69 +227,128 @@ export const FoodCard2 = () => {
           justifyContent: "space-between",
         }}
       >
-        {FoodData.map((food) => (
-          <TouchableOpacity
-            key={food.id}
-            onPress={() => navigation.navigate("MealCard", { food })}
+        {foodCards}
+      </View>
+    </ScrollView>
+  );
+});
+
+// --------------------- Detailed Food List Page ------------------------
+export const Detailedfoodlist = React.memo(() => {
+  const route = useRoute();
+  const navigation = useNavigation();
+  const mealName = route.params?.mealName || "";
+
+  const filteredFoods = useMemo(() => {
+    return FoodData.filter((food) =>
+      food.id.toLowerCase().startsWith(mealName)
+    );
+  }, [mealName]);
+
+  const handleFoodPress = useCallback((food) => {
+    navigation.navigate("MealCard", { 
+      food: {
+        id: food.id,
+        name: food.name,
+        image: food.image,
+        rating: food.rating,
+        ingredients: food.ingredients,
+        method: food.method,
+        funFact: food.funFact
+      }
+    });
+  }, [navigation]);
+
+  const handleGoBack = useCallback(() => {
+    navigation.goBack();
+  }, [navigation]);
+
+  const foodCards = useMemo(() => {
+    return filteredFoods.map((food) => (
+      <View
+        key={food.id}
+        style={{
+          width: "48%",
+          marginBottom: 12,
+          alignItems: "center",
+        }}
+      >
+        <TouchableOpacity onPress={() => handleFoodPress(food)}>
+          <View
+          style={{
+            width: "100%",
+            aspectRatio: 1,
+            borderRadius: 20,
+            borderWidth: 1,
+            borderColor: "#003A00",
+            overflow: "hidden",
+            backgroundColor: "#fff",
+            shadowColor: "#003A00",
+            shadowOffset: { width: 0, height: 8 },
+            shadowOpacity: 0.3,
+            shadowRadius: 12,
+            elevation: 12,
+            position: "relative",
+          }}
+        >
+          <Image
+            source={{ uri: food.image }}
+            style={{ width: "100%", height: "100%", resizeMode: "cover" }}
+          />
+          
+          {/* Gradient overlay for better text readability */}
+          <View
             style={{
-              width: "48%",
-              marginBottom: 12,
-              paddingHorizontal: 4,
-              alignItems: "center",
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: "40%",
+              backgroundColor: "rgba(0, 58, 0, 0.4)",
+            }}
+          />
+          
+          {/* Food name overlay */}
+          <View
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              padding: 12,
             }}
           >
-            <View
-              style={{
-                width: "100%",
-                aspectRatio: 1,
-                borderRadius: 16,
-                borderWidth: 1,
-                borderColor: "#003A00",
-                overflow: "hidden",
-                backgroundColor: "#fff",
-              }}
-            >
-              <Image
-                source={{ uri: food.image }}
-                style={{ width: "100%", height: "100%", resizeMode: "cover" }}
-              />
-            </View>
             <Text
               style={{
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: "bold",
-                color: "#003A00",
-                marginTop: 8,
+                color: "#ffffff",
+                textShadowColor: "rgba(0, 0, 0, 0.8)",
+                textShadowOffset: { width: 1, height: 1 },
+                textShadowRadius: 2,
+                lineHeight: 18,
                 textAlign: "center",
               }}
             >
               {food.name}
             </Text>
-            <Text
-              style={{
-                fontSize: 15,
-                color: "#888",
-                textAlign: "center",
-              }}
-            >
-              ⭐ {food.rating}
-            </Text>
-          </TouchableOpacity>
-        ))}
+          </View>
+        </View>
+        </TouchableOpacity>
+        <Text
+          style={{
+            fontSize: 14,
+            fontWeight: "600",
+            marginTop: 8,
+            textAlign: "center",
+            color: "#003A00",
+          }}
+        >
+          ⭐ {food.rating}
+        </Text>
       </View>
-    </ScrollView>
-  );
-};
-
-// --------------------- Detailed Food List Page ------------------------
-export const Detailedfoodlist = () => {
-  const route = useRoute();
-  const navigation = useNavigation();
-  const mealName = route.params?.mealName || "";
-
-  const filteredFoods = FoodData.filter((food) =>
-    food.id.toLowerCase().startsWith(mealName)
-  );
+    ));
+  }, [filteredFoods, handleFoodPress]);
 
   return (
     <ScrollView
@@ -183,6 +358,10 @@ export const Detailedfoodlist = () => {
         paddingTop: "10%",
         paddingBottom: 30,
       }}
+      removeClippedSubviews={true}
+      maxToRenderPerBatch={10}
+      windowSize={10}
+      initialNumToRender={6}
     >
       <View className="flex-row justify-between items-center mb-4">
         <Text
@@ -196,7 +375,7 @@ export const Detailedfoodlist = () => {
           {mealName}
         </Text>
         <TouchableOpacity
-          onPress={() => navigation.goBack()}
+          onPress={handleGoBack}
           className="flex-row items-center"
         >
           <AntDesign name="left" size={24} color="#008000" />
@@ -212,51 +391,7 @@ export const Detailedfoodlist = () => {
         }}
       >
         {filteredFoods.length > 0 ? (
-          filteredFoods.map((food) => (
-            <View
-              key={food.id}
-              style={{
-                width: "48%",
-                marginBottom: 12,
-                alignItems: "center",
-              }}
-            >
-              <TouchableOpacity
-                onPress={() => navigation.navigate("MealCard", { food })}>
-                <View
-                style={{
-                  width: "100%",
-                  aspectRatio: 1,
-                  borderRadius: 16,
-                  borderWidth: 1,
-                  borderColor: "#ccc",
-                  overflow: "hidden",
-                }}
-              >
-                <Image
-                  source={{ uri: food.image }}
-                  style={{ width: "100%", height: "100%" }}
-                  resizeMode="cover"
-                />
-              </View>
-              </TouchableOpacity>
-              <Text
-                style={{
-                  fontSize: 18,
-                  fontWeight: "bold",
-                  marginTop: 8,
-                  textAlign: "center",
-                }}
-              >
-                {food.name}
-              </Text>
-              <Text
-                style={{ fontSize: 15, color: "#888", textAlign: "center" }}
-              >
-                ⭐ {food.rating}
-              </Text>
-            </View>
-          ))
+          foodCards
         ) : (
           <View style={{ flex: 1, alignItems: "center", padding: 20 }}>
             <Text style={{ fontSize: 16, color: "#888" }}>
@@ -267,7 +402,7 @@ export const Detailedfoodlist = () => {
       </View>
     </ScrollView>
   );
-};
+});
 
 // --------------------- Grid Layout Addable Card ------------------------
 export const FoodCard3 = ({ cardName, image = [], text, onPress, onLongPress }) => {

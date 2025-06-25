@@ -3,6 +3,7 @@ import { useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Image, Text, TextInput, TouchableOpacity, View } from "react-native";
 // import OtpInput from "react-otp-input"; // Not compatible with React Native
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Button from "../Components/Button";
 import OTPverification from "../Components/OTPverification";
 
@@ -172,10 +173,12 @@ const Login = () => {
   );
 };
 export const Login1 = () => {
+  const navigation = useNavigation();
   const [timer, setTimer] = useState(60);
   const [canResend, setCanResend] = useState(false);
   const [showResend, setShowResend] = useState(false);
   const [otp, setOtp] = useState(""); // Track OTP input
+  const [isVerified, setIsVerified] = useState(false);
 
   useEffect(() => {
     let interval;
@@ -212,8 +215,17 @@ export const Login1 = () => {
       {!showResend && (
         <Button
           title="Confirm Email"
-          onPress={() => {
+          onPress={async () => {
             setShowResend(true);
+            setIsVerified(true);
+            // Automatically complete registration when OTP is confirmed
+            try {
+              await AsyncStorage.setItem('isLoggedIn', 'true');
+              navigation.navigate("Home");
+            } catch (error) {
+              console.log('Error saving login status:', error);
+              navigation.navigate("Home");
+            }
           }}
         />
       )}
@@ -334,10 +346,19 @@ export const Login2 = () => {
 
         <Button
           title="Log In"
-          onPress={() => {
+          onPress={async () => {
             setSubmitted(true);
             if (username && password) {
-              navigation.navigate("Home");
+              try {
+                // Set login status to true
+                await AsyncStorage.setItem('isLoggedIn', 'true');
+                // Navigate to Home
+                navigation.navigate("Home");
+              } catch (error) {
+                console.log('Error saving login status:', error);
+                // Still navigate to Home even if saving fails
+                navigation.navigate("Home");
+              }
             }
           }}
         />
