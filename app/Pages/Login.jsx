@@ -1,14 +1,16 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Image, Text, TextInput, TouchableOpacity, View } from "react-native";
 // import OtpInput from "react-otp-input"; // Not compatible with React Native
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Button from "../Components/Button";
 import OTPverification from "../Components/OTPverification";
+import { useTheme } from '../theme.jsx';
 
 const Login = () => {
   const navigation = useNavigation();
+  const { theme } = useTheme();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,7 +27,7 @@ const Login = () => {
   };
 
   return (
-    <View className="flex-1 items-center py-[40%] bg-[#D9ECD9] relative">
+    <View style={[styles.container, { backgroundColor: theme.primaryBackground }]}>
       <View
         className="rounded-full overflow-hidden"
         style={{ width: "40%", aspectRatio: 1, alignSelf: "center" }}>
@@ -39,98 +41,88 @@ const Login = () => {
       <View style={{ width: "80%", marginTop: 32 }}>
         <TextInput
           placeholder="Username"
-          placeholderTextColor={"#ccc"}
+          placeholderTextColor={theme.inputPlaceholder}
           value={username}
           onChangeText={setUsername}
-          style={{
-            borderWidth: 1,
-            borderColor: "#ccc",
-            borderRadius: 8,
-            marginBottom: 12,
-            padding: 10,
-            backgroundColor: "#fff",
-          }}
+          style={[styles.input, { 
+            borderColor: theme.borderLight, 
+            backgroundColor: theme.inputBackground,
+            color: theme.primaryText 
+          }]}
         />
         {submitted && !username ? (
-          <Text style={{ color: "red" }}>Username is required</Text>
+          <Text style={{ color: theme.error }}>Username is required</Text>
         ) : null}
 
         <TextInput
           placeholder="Email"
-          placeholderTextColor={"#ccc"}
+          placeholderTextColor={theme.inputPlaceholder}
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
-          style={{
-            borderWidth: 1,
-            borderColor: "#ccc",
-            borderRadius: 8,
-            marginBottom: 12,
-            padding: 10,
-            backgroundColor: "#fff",
-          }}
+          style={[styles.input, { 
+            borderColor: theme.borderLight, 
+            backgroundColor: theme.inputBackground,
+            color: theme.primaryText 
+          }]}
         />
         {submitted && !email ? (
-          <Text style={{ color: "red" }}>Email is required</Text>
+          <Text style={{ color: theme.error }}>Email is required</Text>
         ) : submitted && !isValidEmail(email) ? (
-          <Text style={{ color: "red" }}>Enter a valid email address</Text>
+          <Text style={{ color: theme.error }}>Enter a valid email address</Text>
         ) : null}
 
         <View style={{ position: "relative", marginBottom: 12 }}>
           <TextInput
             placeholder="Password"
-            placeholderTextColor={"#ccc"}
+            placeholderTextColor={theme.inputPlaceholder}
             value={password}
             onChangeText={setPassword}
             secureTextEntry={!showPassword}
-            style={{
-              borderWidth: 1,
-              borderColor: "#ccc",
-              borderRadius: 8,
-              padding: 10,
-              backgroundColor: "#fff",
-              paddingRight: 40,
-            }}
+            style={[styles.input, { 
+              borderColor: theme.borderLight, 
+              backgroundColor: theme.inputBackground,
+              color: theme.primaryText,
+              paddingRight: 40 
+            }]}
           />
           <MaterialIcons
             name={showPassword ? "visibility" : "visibility-off"}
             size={24}
-            color="#888"
+            color={theme.secondaryText}
             style={{ position: "absolute", right: 10, top: 12 }}
             onPress={() => setShowPassword(!showPassword)}
           />
         </View>
         {submitted && !password ? (
-          <Text style={{ color: "red" }}>Password is required</Text>
+          <Text style={{ color: theme.error }}>Password is required</Text>
         ) : null}
 
         <View style={{ position: "relative", marginBottom: 12 }}>
           <TextInput
             placeholder="Confirm Password"
-            placeholderTextColor={"#ccc"}
+            placeholderTextColor={theme.inputPlaceholder}
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry={!showConfirmPassword}
-            style={{
-              borderWidth: 1,
-              borderColor: "#ccc",
-              borderRadius: 8,
-              padding: 10,
-              backgroundColor: "#fff",
-              paddingRight: 40,
-            }}
+            style={[styles.input, { 
+              borderColor: theme.borderLight, 
+              backgroundColor: theme.inputBackground,
+              color: theme.primaryText,
+              paddingRight: 40 
+            }]}
           />
           <MaterialIcons
             name={showConfirmPassword ? "visibility" : "visibility-off"}
             size={24}
-            color="#888"
+            color={theme.secondaryText}
             style={{ position: "absolute", right: 10, top: 12 }}
             onPress={() => setShowConfirmPassword(!showConfirmPassword)}
           />
         </View>
         {submitted && !confirmPassword ? (
-          <Text style={{ color: "red" }}>Confirm Password is required</Text>
+          <Text style={{ color: theme.error }}>Confirm Password is required</Text>
         ) : null}
 
         <Button
@@ -150,19 +142,19 @@ const Login = () => {
         />
       </View>
       <View className="mt-4 flex-row items-center">
-        <Text className="text-xl">Already have an account?</Text>
+        <Text style={[styles.loginText, { color: theme.primaryText }]}>Already have an account?</Text>
         <TouchableOpacity
           className=""
           onPress={() => navigation.navigate("Login2")}>
-          <Text className="text-[#008000] text-xl"> Log in</Text>
+          <Text style={[styles.loginLink, { color: theme.primaryGreen }]}> Log in</Text>
         </TouchableOpacity>
       </View>
       <View className="absolute bottom-10">
-        <Text className="text-lg text-gray-500 text-center ">
+        <Text style={[styles.footerText, { color: theme.secondaryText }]}>
           <MaterialIcons
             name="lock"
             size={20}
-            color="#008000"
+            color={theme.primaryGreen}
             style={{ marginRight: 6 }}
           />
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi,
@@ -172,14 +164,16 @@ const Login = () => {
     </View>
   );
 };
+
 export const Login1 = () => {
   const navigation = useNavigation();
-  const [timer, setTimer] = useState(60);
-  const [canResend, setCanResend] = useState(false);
+  const { theme } = useTheme();
+  const [otp, setOtp] = useState("");
   const [showResend, setShowResend] = useState(false);
-  const [otp, setOtp] = useState(""); // Track OTP input
-  const [isVerified, setIsVerified] = useState(false);
+  const [timer, setTimer] = useState(30);
+  const [canResend, setCanResend] = useState(false);
 
+  // Timer effect
   useEffect(() => {
     let interval;
     if (showResend && timer > 0) {
@@ -189,18 +183,30 @@ export const Login1 = () => {
       setCanResend(true);
     }
     return () => clearInterval(interval);
-  }, [timer, showResend]);
+  }, [showResend, timer]);
 
-  // Reset timer and canResend when showResend is triggered
+  // Reset timer when resend is clicked
+  const handleResend = () => {
+    setTimer(30);
+    setCanResend(false);
+    setShowResend(true);
+    // Here you would trigger resend OTP logic
+  };
+
+  // When 6 digits entered, instantly navigate
   useEffect(() => {
-    if (showResend) {
-      setTimer(60);
-      setCanResend(false);
+    if (otp.length === 6) {
+      (async () => {
+        try {
+          await AsyncStorage.setItem('isLoggedIn', 'true');
+        } catch (e) {}
+        navigation.navigate("Home");
+      })();
     }
-  }, [showResend]);
+  }, [otp]);
 
   return (
-    <View className="flex-1 items-center py-[30%] bg-[#D9ECD9]">
+    <View style={[styles.container, { backgroundColor: theme.primaryBackground }]}> 
       <View
         className="rounded-full overflow-hidden"
         style={{ width: "30%", aspectRatio: 1, alignSelf: "center" }}>
@@ -210,22 +216,14 @@ export const Login1 = () => {
           resizeMode="contain"
         />
       </View>
-      {/* Pass setOtp to OTPverification so it can update otp state */}
       <OTPverification value={otp} onChange={setOtp} />
       {!showResend && (
         <Button
-          title="Confirm Email"
-          onPress={async () => {
+          title="Verify"
+          onPress={() => {
             setShowResend(true);
-            setIsVerified(true);
-            // Automatically complete registration when OTP is confirmed
-            try {
-              await AsyncStorage.setItem('isLoggedIn', 'true');
-              navigation.navigate("Home");
-            } catch (error) {
-              console.log('Error saving login status:', error);
-              navigation.navigate("Home");
-            }
+            setTimer(30);
+            setCanResend(false);
           }}
         />
       )}
@@ -233,29 +231,24 @@ export const Login1 = () => {
         <TouchableOpacity
           className="px-[28%] py-3 rounded-full mt-4 border flex-row justify-center items-center"
           style={{
-            backgroundColor: canResend ? "#008000" : "#fff",
-            borderColor: "#008000",
+            backgroundColor: canResend ? theme.primaryGreen : theme.inputBackground,
+            borderColor: theme.primaryGreen,
           }}
           disabled={!canResend}
-          onPress={() => {
-            if (canResend) {
-              setTimer(60);
-              setCanResend(false);
-              // Add resend logic here
-            }
-          }}>
+          onPress={handleResend}
+        >
           <Text
             className="text-lg font-semibold text-center"
             style={{
-              color: canResend ? "#fff" : "#008000",
+              color: canResend ? theme.inverseText : theme.primaryGreen,
               marginRight: timer > 0 ? 8 : 0,
             }}>
             Resend Code
           </Text>
           {timer > 0 && (
             <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <MaterialIcons name="timer" size={20} color="#008000" />
-              <Text style={{ marginLeft: 4, fontSize: 16, color: "#008000" }}>
+              <MaterialIcons name="timer" size={20} color={theme.primaryGreen} />
+              <Text style={{ marginLeft: 4, fontSize: 16, color: theme.primaryGreen }}>
                 {timer}
               </Text>
             </View>
@@ -263,11 +256,11 @@ export const Login1 = () => {
         </TouchableOpacity>
       )}
       <View className="absolute bottom-10">
-        <Text className="text-lg text-gray-500 text-center ">
+        <Text style={[styles.footerText, { color: theme.secondaryText }]}> 
           <MaterialIcons
             name="lock"
             size={20}
-            color="#008000"
+            color={theme.primaryGreen}
             style={{ marginRight: 6 }}
           />
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi,
@@ -280,13 +273,14 @@ export const Login1 = () => {
 
 export const Login2 = () => {
   const navigation = useNavigation();
+  const { theme } = useTheme();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <View className="flex-1 items-center py-[40%] bg-[#D9ECD9] relative">
+    <View style={[styles.container, { backgroundColor: theme.primaryBackground }]}>
       <View
         className="rounded-full overflow-hidden"
         style={{ width: "30%", aspectRatio: 1, alignSelf: "center" }}>
@@ -300,48 +294,43 @@ export const Login2 = () => {
       <View style={{ width: "80%", marginTop: 32 }}>
         <TextInput
           placeholder="Username"
-          placeholderTextColor={"#ccc"}
+          placeholderTextColor={theme.inputPlaceholder}
           value={username}
           onChangeText={setUsername}
-          style={{
-            borderWidth: 1,
-            borderColor: "#ccc",
-            borderRadius: 8,
-            marginBottom: 12,
-            padding: 10,
-            backgroundColor: "#fff",
-          }}
+          style={[styles.input, { 
+            borderColor: theme.borderLight, 
+            backgroundColor: theme.inputBackground,
+            color: theme.primaryText 
+          }]}
         />
         {submitted && !username ? (
-          <Text style={{ color: "red" }}>Username is required</Text>
+          <Text style={{ color: theme.error }}>Username is required</Text>
         ) : null}
 
         <View style={{ position: "relative", marginBottom: 12 }}>
           <TextInput
             placeholder="Password"
-            placeholderTextColor={"#ccc"}
+            placeholderTextColor={theme.inputPlaceholder}
             value={password}
             onChangeText={setPassword}
             secureTextEntry={!showPassword}
-            style={{
-              borderWidth: 1,
-              borderColor: "#ccc",
-              borderRadius: 8,
-              padding: 10,
-              backgroundColor: "#fff",
-              paddingRight: 40,
-            }}
+            style={[styles.input, { 
+              borderColor: theme.borderLight, 
+              backgroundColor: theme.inputBackground,
+              color: theme.primaryText,
+              paddingRight: 40 
+            }]}
           />
           <MaterialIcons
             name={showPassword ? "visibility" : "visibility-off"}
             size={24}
-            color="#888"
+            color={theme.secondaryText}
             style={{ position: "absolute", right: 10, top: 12 }}
             onPress={() => setShowPassword(!showPassword)}
           />
         </View>
         {submitted && !password ? (
-          <Text style={{ color: "red" }}>Password is required</Text>
+          <Text style={{ color: theme.error }}>Password is required</Text>
         ) : null}
 
         <Button
@@ -365,11 +354,11 @@ export const Login2 = () => {
       </View>
 
       <View className="absolute bottom-10">
-        <Text className="text-lg text-gray-500 text-center ">
+        <Text style={[styles.footerText, { color: theme.secondaryText }]}>
           <MaterialIcons
             name="lock"
             size={20}
-            color="#008000"
+            color={theme.primaryGreen}
             style={{ marginRight: 6 }}
           />
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi,
@@ -378,6 +367,30 @@ export const Login2 = () => {
       </View>
     </View>
   );
+};
+
+const styles = {
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: '40%',
+  },
+  input: {
+    borderWidth: 1,
+    borderRadius: 8,
+    marginBottom: 12,
+    padding: 10,
+  },
+  loginText: {
+    fontSize: 20,
+  },
+  loginLink: {
+    fontSize: 20,
+  },
+  footerText: {
+    fontSize: 18,
+    textAlign: 'center',
+  },
 };
 
 export default Login;

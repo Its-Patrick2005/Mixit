@@ -2,7 +2,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Alert,
   Image,
@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import { FoodCard3 } from "../Components/FoodCard";
 import foodList from "../FoodData";
+import { useTheme } from '../theme.jsx';
 
 // ============ Recipe Screen ============
 const Recipe = ({ cookbooks = [], setCookbooks = () => {} }) => {
@@ -23,6 +24,7 @@ const Recipe = ({ cookbooks = [], setCookbooks = () => {} }) => {
   const [activeCookbookIndex, setActiveCookbookIndex] = useState(null);
   const [localCookbooks, setLocalCookbooks] = useState([]);
   const navigation = useNavigation();
+  const { theme } = useTheme();
 
   // Load cookbooks from AsyncStorage on component mount
   useEffect(() => {
@@ -147,15 +149,15 @@ const Recipe = ({ cookbooks = [], setCookbooks = () => {} }) => {
 
   return (
     <ScrollView
-      className="bg-[#D9ECD9] pt-10 px-3"
+      style={{ backgroundColor: theme.primaryBackground, paddingTop: 40, paddingHorizontal: 12 }}
       contentContainerStyle={{ paddingBottom: 50 }}>
       {/* Cookbooks Grid in Rows of 2 */}
       {groupedCookbooks.map((row, rowIndex) => (
-        <View key={rowIndex} className="flex-row justify-between ">
+        <View key={rowIndex} style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           {row.map((cookbook, index) => {
             const realIndex = rowIndex * 2 + index;
             return (
-              <View key={realIndex} className="relative w-[48%] mb-4">
+              <View key={realIndex} style={{ position: 'relative', width: '48%', marginBottom: 16 }}>
                 <FoodCard3
                   cardName={cookbook.title}
                   text={`${cookbook.recipes.length} Recipes`}
@@ -179,12 +181,22 @@ const Recipe = ({ cookbooks = [], setCookbooks = () => {} }) => {
                   }}
                 />
                 <TouchableOpacity
-                  className="absolute -top-2 left-2 z-10 bg-white rounded-full p-1 border border-[#003A00]"
+                  style={{
+                    position: 'absolute',
+                    top: -8,
+                    left: 8,
+                    zIndex: 10,
+                    backgroundColor: theme.cardBackground,
+                    borderRadius: 20,
+                    padding: 4,
+                    borderWidth: 1,
+                    borderColor: theme.primaryGreen,
+                  }}
                   onPress={() => {
                     setActiveCookbookIndex(realIndex);
                     setModalVisible(true);
                   }}>
-                  <Ionicons name="add" size={20} color="#003A00" />
+                  <Ionicons name="add" size={20} color={theme.primaryGreen} />
                 </TouchableOpacity>
               </View>
             );
@@ -194,25 +206,39 @@ const Recipe = ({ cookbooks = [], setCookbooks = () => {} }) => {
 
       {/* Create New Cookbook */}
       <TouchableOpacity
-        className="bg-[#D9ECD9] py-10 w-[40%] px-4 rounded-xl mt-4 ml-2 mb-10 border-2 border-[#003A00] items-center"
+        style={{
+          backgroundColor: theme.primaryBackground,
+          paddingVertical: 40,
+          width: '40%',
+          paddingHorizontal: 16,
+          borderRadius: 12,
+          marginTop: 16,
+          marginLeft: 8,
+          marginBottom: 40,
+          borderWidth: 2,
+          borderColor: theme.primaryGreen,
+          alignItems: 'center',
+        }}
         onPress={handleCreateCookbook}>
-        <Ionicons name="add-circle-outline" size={24} color="#003A00" />
-        <Text className="text-[#003A00] font-semibold text-center">
-          Create Cookbook
+        <Ionicons name="add-circle-outline" size={24} color={theme.primaryGreen} />
+        <Text style={{
+          color: theme.primaryGreen,
+          fontWeight: '600',
+          textAlign: 'center',
+          marginTop: 8,
+        }}>
+          Create New Cookbook
         </Text>
       </TouchableOpacity>
 
       {/* Add Recipe Modal */}
       <Recipe2
         visible={modalVisible}
-        onClose={() => {
-          setModalVisible(false);
-          setActiveCookbookIndex(null);
-        }}
+        onClose={() => setModalVisible(false)}
         onAddRecipe={handleAddRecipe}
       />
 
-      {/* Cookbook Name Modal */}
+      {/* Create Cookbook Modal */}
       <CookbookNameModal
         visible={cookbookNameModalVisible}
         onClose={() => setCookbookNameModalVisible(false)}
@@ -222,79 +248,30 @@ const Recipe = ({ cookbooks = [], setCookbooks = () => {} }) => {
   );
 };
 
-// ============ Modal Dialog ============
-export const Recipe2 = ({ visible, onClose, onAddRecipe }) => {
-  const [query, setQuery] = useState("");
-
-  const handleSubmit = () => {
-    if (query.trim()) {
-      onAddRecipe(query.trim());
-      setQuery("");
-    } else {
-      alert("Please enter a food name.");
-    }
-  };
-
-  return (
-    <Modal visible={visible} transparent animationType="slide">
-      <View className="flex-1 justify-center items-center bg-black/50">
-        <View className="bg-white p-6 rounded-xl w-[85%]">
-          <Text className="text-lg font-bold mb-4">Add a Food</Text>
-          <TextInput
-            placeholder="Food Name (e.g., Jollof Rice)"
-            value={query}
-            onChangeText={setQuery}
-            className="border mb-4 p-2 rounded"
-          />
-          <TouchableOpacity
-            className="bg-green-700 p-3 rounded mb-2"
-            onPress={handleSubmit}>
-            <Text className="text-white text-center">Add</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={onClose}>
-            <Text className="text-center text-red-500">Cancel</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </Modal>
-  );
-};
-
-// ============ Recipe3 ============
+// ============ Recipe3 Screen (Cookbook Details) ============
 export const Recipe3 = () => {
   const route = useRoute();
   const navigation = useNavigation();
-  const { recipes = [], cookbookTitle = "My Cookbook", cookbookIndex } = route.params;
-  
-  // Add state to manage recipes locally
-  const [localRecipes, setLocalRecipes] = useState(recipes);
+  const { recipes, cookbookTitle, cookbookIndex } = route.params;
+  const { theme } = useTheme();
 
-  // Update local recipes when route params change
-  useEffect(() => {
-    setLocalRecipes(recipes);
-  }, [recipes]);
-
-  // Helper to delete a recipe with confirmation
   const confirmDeleteRecipe = async (idx) => {
     Alert.alert(
       'Delete Recipe',
-      `Are you sure you want to delete "${localRecipes[idx]?.name}" from this cookbook?`,
+      `Are you sure you want to delete "${recipes[idx].name}"?`,
       [
         { text: 'Cancel', style: 'cancel' },
         { 
           text: 'Delete', 
-          style: 'destructive', 
+          style: 'destructive',
           onPress: async () => {
             try {
               const savedCookbooks = await AsyncStorage.getItem('cookbooks');
-              if (savedCookbooks && typeof cookbookIndex === 'number') {
+              if (savedCookbooks) {
                 const cookbooks = JSON.parse(savedCookbooks);
-                const updatedCookbooks = [...cookbooks];
-                updatedCookbooks[cookbookIndex].recipes = updatedCookbooks[cookbookIndex].recipes.filter((_, i) => i !== idx);
-                await AsyncStorage.setItem('cookbooks', JSON.stringify(updatedCookbooks));
-                
-                // Update local state immediately
-                setLocalRecipes(updatedCookbooks[cookbookIndex].recipes);
+                cookbooks[cookbookIndex].recipes = cookbooks[cookbookIndex].recipes.filter((_, i) => i !== idx);
+                await AsyncStorage.setItem('cookbooks', JSON.stringify(cookbooks));
+                navigation.goBack();
               }
             } catch (error) {
               console.log('Error deleting recipe:', error);
@@ -305,143 +282,234 @@ export const Recipe3 = () => {
     );
   };
 
-  // Group recipes into rows of two
-  const groupedRecipes = [];
-  for (let i = 0; i < localRecipes.length; i += 2) {
-    groupedRecipes.push(localRecipes.slice(i, i + 2));
-  }
+  return (
+    <View style={{ flex: 1, backgroundColor: theme.primaryBackground }}>
+      {/* Header */}
+      <View style={{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingTop: 60,
+        paddingHorizontal: 20,
+        paddingBottom: 20,
+        backgroundColor: theme.secondaryGreen,
+      }}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <AntDesign name="left" size={24} color={theme.primaryGreen} />
+        </TouchableOpacity>
+        <Text style={{
+          fontSize: 20,
+          fontWeight: 'bold',
+          color: theme.primaryText,
+        }}>
+          {cookbookTitle}
+        </Text>
+        <View style={{ width: 24 }} />
+      </View>
+
+      {/* Recipes List */}
+      <ScrollView style={{ padding: 16 }}>
+        {recipes.map((recipe, index) => (
+          <View key={index} style={{
+            backgroundColor: theme.cardBackground,
+            borderRadius: 16,
+            padding: 16,
+            marginBottom: 16,
+            shadowColor: theme.shadow,
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            elevation: 4,
+            borderWidth: 1,
+            borderColor: theme.border,
+          }}>
+            <TouchableOpacity
+              onPress={() => {
+                // Find the complete recipe data from foodList
+                const fullRecipe = foodList.find(f => f.name === recipe.name) || recipe;
+                navigation.navigate("MealCard", { 
+                  food: {
+                    id: fullRecipe.id || recipe.id || `recipe-${index}`,
+                    name: fullRecipe.name,
+                    image: fullRecipe.image,
+                    rating: fullRecipe.rating || 4.0,
+                    ingredients: fullRecipe.ingredients || [],
+                    method: fullRecipe.method || [],
+                    funFact: fullRecipe.funFact || ""
+                  }
+                });
+              }}
+              style={{ flexDirection: 'row', alignItems: 'center' }}
+            >
+              <Image
+                source={{ uri: recipe.image }}
+                style={{
+                  width: 60,
+                  height: 60,
+                  borderRadius: 12,
+                  marginRight: 16,
+                }}
+              />
+              <View style={{ flex: 1 }}>
+                <Text style={{
+                  fontSize: 18,
+                  fontWeight: 'bold',
+                  color: theme.primaryText,
+                  marginBottom: 4,
+                }}>
+                  {recipe.name}
+                </Text>
+                <Text style={{
+                  fontSize: 14,
+                  color: theme.secondaryText,
+                }}>
+                  Recipe in cookbook
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={theme.primaryGreen} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => confirmDeleteRecipe(index)}
+              style={{
+                backgroundColor: theme.error,
+                padding: 8,
+                borderRadius: 8,
+                position: 'absolute',
+                top: 16,
+                right: 16,
+              }}
+            >
+              <Ionicons name="trash-outline" size={20} color="white" />
+            </TouchableOpacity>
+          </View>
+        ))}
+
+        {recipes.length === 0 && (
+          <View style={{
+            alignItems: 'center',
+            padding: 40,
+          }}>
+            <Text style={{
+              fontSize: 16,
+              color: theme.tertiaryText,
+              textAlign: 'center',
+            }}>
+              No recipes in this cookbook yet.
+            </Text>
+          </View>
+        )}
+      </ScrollView>
+    </View>
+  );
+};
+
+// ============ Recipe2 Modal (Add Recipe) ============
+export const Recipe2 = ({ visible, onClose, onAddRecipe }) => {
+  const [foodName, setFoodName] = useState("");
+  const { theme } = useTheme();
+
+  const handleSubmit = () => {
+    if (foodName.trim()) {
+      onAddRecipe(foodName);
+      setFoodName("");
+    } else {
+      alert("Please enter a food name.");
+    }
+  };
 
   return (
-    <ScrollView className="bg-[#D9ECD9] pt-10 px-3">
-      <TouchableOpacity
-        onPress={() => navigation.goBack()}
-        className="flex-row items-center mb-4">
-        <AntDesign name="left" size={24} color="#008000" />
-        <Text style={{ fontSize: 18, color: "#008000" }}>Back</Text>
-      </TouchableOpacity>
-      
-      <Text className="text-2xl font-bold mb-6 text-[#003A00] px-2">
-        {cookbookTitle}
-      </Text>
-
-      {/* Recipes Grid in Rows of 2 */}
-      {groupedRecipes.map((row, rowIndex) => (
-        <View key={rowIndex} className="flex-row justify-between mb-4">
-          {row.map((recipe, index) => {
-            const realIndex = rowIndex * 2 + index;
-            const fullData = foodList.find(
-              (item) => item.name.toLowerCase() === recipe.name.toLowerCase()
-            );
-            
-            if (!fullData) return null;
-            
-            return (
-              <View key={realIndex} className="relative w-[48%]">
-                <TouchableOpacity
-                  onPress={() => navigation.navigate("MealCard", { 
-                    food: {
-                      id: fullData.id,
-                      name: fullData.name,
-                      image: fullData.image,
-                      rating: fullData.rating,
-                      ingredients: fullData.ingredients,
-                      method: fullData.method,
-                      funFact: fullData.funFact
-                    }
-                  })}
-                  onLongPress={() => confirmDeleteRecipe(realIndex)}
-                  style={{
-                    borderRadius: 20,
-                    borderWidth: 1,
-                    borderColor: "#003A00",
-                    overflow: "hidden",
-                    shadowColor: "#003A00",
-                    shadowOffset: { width: 0, height: 8 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 12,
-                    elevation: 12,
-                    position: "relative",
-                  }}
-                >
-                  <Image
-                    source={{ uri: fullData.image }}
-                    style={{ width: "100%", height: 160, resizeMode: "cover" }}
-                  />
-                  
-                  {/* Gradient overlay for better text readability */}
-                  <View
-                    style={{
-                      position: "absolute",
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      height: "40%",
-                      backgroundColor: "rgba(0, 58, 0, 0.4)",
-                    }}
-                  />
-                  
-                  {/* Text overlay at bottom */}
-                  <View
-                    style={{
-                      position: "absolute",
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      padding: 12,
-                    }}
-                  >
-                    <Text style={{
-                      color: "#ffffff",
-                      fontWeight: "bold",
-                      fontSize: 14,
-                      textAlign: "center",
-                      lineHeight: 18,
-                      textShadowColor: "rgba(0, 0, 0, 0.8)",
-                      textShadowOffset: { width: 1, height: 1 },
-                      textShadowRadius: 2,
-                    }}>
-                      {fullData.name}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-                
-                {/* Delete indicator on long press */}
-                <View className="absolute -top-2 -right-2 bg-red-500 rounded-full w-6 h-6 items-center justify-center opacity-0">
-                  <AntDesign name="delete" size={12} color="white" />
-                </View>
-              </View>
-            );
-          })}
-        </View>
-      ))}
-
-      {/* Empty state */}
-      {localRecipes.length === 0 && (
-        <View className="flex-1 items-center justify-center py-20">
-          <Ionicons name="book-outline" size={80} color="#003A00" />
-          <Text className="text-[#003A00] text-lg font-semibold mt-4 text-center">
-            No recipes yet
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
+      <View style={{
+        flex: 1,
+        backgroundColor: "rgba(0,0,0,0.5)",
+        justifyContent: "center",
+        alignItems: "center",
+      }}>
+        <View style={{
+          backgroundColor: theme.modalBackground,
+          borderRadius: 20,
+          padding: 24,
+          width: "90%",
+          alignItems: "center",
+          shadowColor: theme.shadow,
+          shadowOpacity: 0.2,
+          shadowRadius: 10,
+          elevation: 10,
+        }}>
+          <TouchableOpacity
+            style={{ position: "absolute", top: 16, right: 16, zIndex: 1 }}
+            onPress={onClose}
+          >
+            <Ionicons name="close" size={28} color={theme.primaryText} />
+          </TouchableOpacity>
+          
+          <Text style={{
+            fontWeight: "bold",
+            fontSize: 20,
+            marginBottom: 24,
+            color: theme.primaryText,
+          }}>
+            Add Recipe
           </Text>
-          <Text className="text-[#003A00] text-sm mt-2 text-center opacity-70">
-            Add some recipes to your cookbook!
-          </Text>
+          
+          <TextInput
+            placeholder="Enter food name"
+            value={foodName}
+            onChangeText={setFoodName}
+            style={{
+              borderWidth: 1,
+              borderColor: theme.borderLight,
+              borderRadius: 8,
+              padding: 12,
+              width: "100%",
+              marginBottom: 16,
+              fontSize: 16,
+              backgroundColor: theme.inputBackground,
+              color: theme.primaryText,
+            }}
+            placeholderTextColor={theme.inputPlaceholder}
+            autoFocus
+          />
+          
+          <TouchableOpacity
+            onPress={handleSubmit}
+            style={{
+              backgroundColor: theme.primaryGreen,
+              borderRadius: 8,
+              paddingVertical: 12,
+              paddingHorizontal: 24,
+              marginBottom: 8,
+            }}
+          >
+            <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>
+              Add Recipe
+            </Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity onPress={onClose}>
+            <Text style={{ color: theme.tertiaryText, fontSize: 16 }}>
+              Cancel
+            </Text>
+          </TouchableOpacity>
         </View>
-      )}
-    </ScrollView>
+      </View>
+    </Modal>
   );
 };
 
 // ============ Cookbook Name Modal ============
 const CookbookNameModal = ({ visible, onClose, onConfirm }) => {
   const [cookbookName, setCookbookName] = useState("");
+  const { theme } = useTheme();
 
   const handleSubmit = () => {
-    if (cookbookName.trim()) {
-      onConfirm(cookbookName);
-      setCookbookName("");
-    } else {
-      alert("Please enter a cookbook name.");
-    }
+    onConfirm(cookbookName);
+    setCookbookName("");
   };
 
   const handleClose = () => {
@@ -450,24 +518,83 @@ const CookbookNameModal = ({ visible, onClose, onConfirm }) => {
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide">
-      <View className="flex-1 justify-center items-center bg-black/50">
-        <View className="bg-white p-6 rounded-xl w-[85%]">
-          <Text className="text-lg font-bold mb-4">Create New Cookbook</Text>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={handleClose}
+    >
+      <View style={{
+        flex: 1,
+        backgroundColor: "rgba(0,0,0,0.5)",
+        justifyContent: "center",
+        alignItems: "center",
+      }}>
+        <View style={{
+          backgroundColor: theme.modalBackground,
+          borderRadius: 20,
+          padding: 24,
+          width: "90%",
+          alignItems: "center",
+          shadowColor: theme.shadow,
+          shadowOpacity: 0.2,
+          shadowRadius: 10,
+          elevation: 10,
+        }}>
+          <TouchableOpacity
+            style={{ position: "absolute", top: 16, right: 16, zIndex: 1 }}
+            onPress={handleClose}
+          >
+            <Ionicons name="close" size={28} color={theme.primaryText} />
+          </TouchableOpacity>
+          
+          <Text style={{
+            fontWeight: "bold",
+            fontSize: 20,
+            marginBottom: 24,
+            color: theme.primaryText,
+          }}>
+            Create New Cookbook
+          </Text>
+          
           <TextInput
-            placeholder="Enter cookbook name (e.g., My Favorite Recipes)"
+            placeholder="Enter cookbook name"
             value={cookbookName}
             onChangeText={setCookbookName}
-            className="border mb-4 p-3 rounded border-gray-300"
-            autoFocus={true}
+            style={{
+              borderWidth: 1,
+              borderColor: theme.borderLight,
+              borderRadius: 8,
+              padding: 12,
+              width: "100%",
+              marginBottom: 16,
+              fontSize: 16,
+              backgroundColor: theme.inputBackground,
+              color: theme.primaryText,
+            }}
+            placeholderTextColor={theme.inputPlaceholder}
+            autoFocus
           />
+          
           <TouchableOpacity
-            className="bg-green-700 p-3 rounded mb-2"
-            onPress={handleSubmit}>
-            <Text className="text-white text-center font-semibold">Create Cookbook</Text>
+            onPress={handleSubmit}
+            style={{
+              backgroundColor: theme.primaryGreen,
+              borderRadius: 8,
+              paddingVertical: 12,
+              paddingHorizontal: 24,
+              marginBottom: 8,
+            }}
+          >
+            <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>
+              Create Cookbook
+            </Text>
           </TouchableOpacity>
+          
           <TouchableOpacity onPress={handleClose}>
-            <Text className="text-center text-red-500">Cancel</Text>
+            <Text style={{ color: theme.tertiaryText, fontSize: 16 }}>
+              Cancel
+            </Text>
           </TouchableOpacity>
         </View>
       </View>

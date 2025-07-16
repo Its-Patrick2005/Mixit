@@ -4,10 +4,13 @@ import FoodCards, { FoodCard2 } from "../Components/FoodCard";
 import ImportTab from "../Components/ImportTab";
 import Navbar from "../Components/Navbar";
 import Search from "../Components/Search";
+import { useTheme } from '../theme.jsx';
 
 const Home = React.memo(() => {
+  const { theme } = useTheme();
+  
   return (
-    <View className="bg-[#D9ECD9] flex-1">
+    <View style={{ flex: 1, backgroundColor: theme.primaryBackground }}>
       <View className="mb-4">
         <Navbar />
       </View>
@@ -19,7 +22,7 @@ const Home = React.memo(() => {
         <FoodCards />
       </View>
       <View className="py-4 ">
-        <Text className="text-2xl font-bold text-[#003A00] px-4">Most Rated Recipes</Text>
+        <Text style={{ fontSize: 24, fontWeight: 'bold', color: theme.primaryText, paddingHorizontal: 16 }}>Most Rated Recipes</Text>
       </View>
 
       <FoodCard2 />

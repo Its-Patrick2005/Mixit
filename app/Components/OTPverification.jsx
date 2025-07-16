@@ -1,11 +1,10 @@
-import React, { useRef, useState } from 'react';
-import { View, TextInput, StyleSheet } from 'react-native';
-import Button from './Button';
-import { useNavigation } from 'expo-router';
+import { useRef, useState } from 'react';
+import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { useTheme } from '../theme.jsx';
 
-const OTPInput = ({ length = 6, onComplete }) => {
-    const navigation = useNavigation();
-    const [otp, setOtp] = useState(Array(length).fill(''));
+const OTPverification = ({ value, onChange }) => {
+    const { theme } = useTheme();
+    const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [isComplete, setIsComplete] = useState(false);
     const inputs = useRef([]);
 
@@ -15,52 +14,51 @@ const OTPInput = ({ length = 6, onComplete }) => {
             newOtp[idx] = text;
             setOtp(newOtp);
 
-            if (text && idx < length - 1) {
+            if (text && idx < 5) {
                 inputs.current[idx + 1].focus();
             }
             const complete = newOtp.every(val => val.length === 1);
             setIsComplete(complete);
             if (complete) {
-                onComplete && onComplete(newOtp.join(''));
+                onChange && onChange(newOtp.join(''));
             }
         }
     };
 
     const handleKeyPress = (e, idx) => {
-        if (e.nativeEvent.key === 'Backspace' && otp[idx] === '' && idx > 0) {
+        if (e.nativeEvent.key === 'Backspace' && !otp[idx] && idx > 0) {
             inputs.current[idx - 1].focus();
         }
     };
 
     const handleLogin = () => {
-        // Add your login logic here
-        onComplete && onComplete(otp.join(''));
+        // Handle login logic
+        console.log("Login pressed");
     };
 
     return (
         <View style={styles.container}>
+            <Text style={[styles.title, { color: theme.primaryText }]}>
+                Enter the verification code sent to your email
+            </Text>
             <View style={styles.otpRow}>
                 {otp.map((digit, idx) => (
                     <TextInput
                         key={idx}
                         ref={ref => (inputs.current[idx] = ref)}
-                        style={styles.input}
-                        keyboardType="number-pad"
-                        maxLength={1}
+                        style={[styles.input, { 
+                            borderColor: digit ? theme.primaryGreen : theme.borderLight,
+                            backgroundColor: theme.inputBackground,
+                            color: theme.primaryText,
+                        }]}
                         value={digit}
-                        onChangeText={text => handleChange(text, idx)}
-                        onKeyPress={e => handleKeyPress(e, idx)}
-                        autoFocus={idx === 0}
+                        onChangeText={(text) => handleChange(text, idx)}
+                        onKeyPress={(e) => handleKeyPress(e, idx)}
+                        keyboardType="numeric"
+                        maxLength={1}
                     />
                 ))}
             </View>
-            {isComplete && (
-                <Button
-                    title="Login"
-                    onPress={()=> navigation.navigate("Home")}
-                    style={styles.loginButton}
-                />
-            )}
         </View>
     );
 };
@@ -68,27 +66,44 @@ const OTPInput = ({ length = 6, onComplete }) => {
 const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
+        marginVertical: 20,
+    },
+    title: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 20,
+        textAlign: 'center',
     },
     otpRow: {
         flexDirection: 'row',
         justifyContent: 'center',
-        alignItems: 'center',
+        marginBottom: 30,
     },
     input: {
-        width: 60,
-        height: 60,
+        width: 45,
+        height: 45,
         borderWidth: 2,
-        borderColor: '#004D00',
         borderRadius: 8,
+        marginHorizontal: 5,
         textAlign: 'center',
         fontSize: 20,
-        backgroundColor: '#fff',
-        marginHorizontal: 4,
+        fontWeight: 'bold',
     },
     loginButton: {
-        marginTop: 24,
-        width: 200,
+        paddingVertical: 12,
+        paddingHorizontal: 40,
+        borderRadius: 25,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    loginButtonText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        textAlign: 'center',
     },
 });
 
-export default OTPInput;
+export default OTPverification;
