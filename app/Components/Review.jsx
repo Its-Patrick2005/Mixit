@@ -1,39 +1,73 @@
-import { FontAwesome } from "@expo/vector-icons";
+import { useState } from "react";
 import { Image, Text, View } from "react-native";
+import { useTheme } from '../theme.jsx';
+
+const placeholderImage = require('../../assets/images/Logo.png');
 
 const Review = ({text,image,name,ratings}) => {
-return (
-    <View className="bg-[#B0D8B0] w-[250px] h-[210px] rounded-br-[80px] relative mt-10 overflow-visible p-2">
-        <View className="absolute -top-10  items-center justify-center">
-            <Text className="text-[100px] font-bold text-[#003A00]">“</Text>
+  const { theme } = useTheme();
+  const [imageError, setImageError] = useState(false);
+  
+  // Determine image source: local or remote
+  let imageSource = imageError
+    ? placeholderImage
+    : (typeof image === 'string' ? { uri: image } : image);
+
+  return (
+    <View style={{
+      backgroundColor: theme.cardBackground,
+      borderRadius: 16,
+      padding: 20,
+      width: 280,
+      shadowColor: theme.shadow,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 8,
+      elevation: 6,
+      borderWidth: 1,
+      borderColor: theme.border,
+    }}>
+      <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 12 }}>
+        <Image
+          source={imageSource}
+          style={{
+            width: 50,
+            height: 50,
+            borderRadius: 25,
+            marginRight: 12,
+            borderWidth: 2,
+            borderColor: theme.border,
+          }}
+          onError={() => setImageError(true)}
+        />
+        <View style={{ flex: 1 }}>
+          <Text style={{
+            fontSize: 16,
+            fontWeight: "bold",
+            color: theme.primaryText,
+            marginBottom: 4,
+          }}>
+            {name}
+          </Text>
+          <Text style={{
+            fontSize: 14,
+            color: theme.primaryGreen,
+            fontWeight: "600",
+          }}>
+            ⭐ {ratings}/5
+          </Text>
         </View>
-        
-        <View className="flex-row items-center mb-2 mt-10">
-            {[...Array(5)].map((_, i) => (
-                <FontAwesome
-                    key={i}
-                    name={i < ratings ? "star" : "star-o"} // 4 filled, 1 outlined for example
-                    size={18}
-                    color="#facc15" // Tailwind yellow-400
-                    className="mr-1"
-                />
-            ))}
-            <Text className="ml-2 text-gray-500 text-xs">(5.0)</Text>
-        </View>
-        <View>
-            <Text>
-                 {text}
-            </Text>
-            <View className="flex-row items-center mt-4">
-                <View className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden mr-2">
-                    {/* Replace with Image component for real avatar */}
-                    <Image  source={require("../../assets/images/Logo.png")} className="w-full h-full"/>
-                </View>
-                <Text className="font-semibold text-gray-700">{name}</Text>
-            </View>
-        </View>
+      </View>
+      <Text style={{
+        fontSize: 14,
+        color: theme.secondaryText,
+        lineHeight: 20,
+        fontStyle: "italic",
+      }}>
+        "{text}"
+      </Text>
     </View>
-);
+  );
 };
 
 export default Review;

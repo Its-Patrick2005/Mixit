@@ -1,5 +1,11 @@
-import { Stack } from "expo-router";
-import "./global.css"
+import "./global.css";
+import Index from './index.jsx';
+import { ThemeProvider } from './theme.jsx';
+
 export default function RootLayout() {
-  return <Stack screenOptions={{headerShown: false}} />;
+  return (
+    <ThemeProvider>
+      <Index />
+    </ThemeProvider>
+  );
 }

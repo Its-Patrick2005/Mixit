@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import FoodData from "../FoodData";
+import { useTheme } from '../theme.jsx';
 
 const meals = {
   breakfast: {
@@ -36,6 +37,8 @@ const meals = {
 // --------------------- FoodCard (Circular Image Card) ----------------------
 const FoodCard = ({ name, image }) => {
   const navigation = useNavigation();
+  const { theme } = useTheme();
+  
   return (
     <TouchableOpacity
       onPress={() =>
@@ -43,7 +46,7 @@ const FoodCard = ({ name, image }) => {
           mealName: name.toLowerCase(),
         })
       }
-      className="flex flex-col items-center mb-2 ml-2"
+      style={{ flexDirection: 'column', alignItems: 'center', marginBottom: 8, marginLeft: 8 }}
     >
       <View
         style={{
@@ -51,13 +54,13 @@ const FoodCard = ({ name, image }) => {
           height: 80,
           borderRadius: 50,
           overflow: "hidden",
-          shadowColor: "#003A00",
+          shadowColor: theme.shadow,
           shadowOffset: { width: 0, height: 8 },
           shadowOpacity: 0.3,
           shadowRadius: 12,
           elevation: 12,
           marginBottom: 6,
-          backgroundColor: "#fff",
+          backgroundColor: theme.cardBackground,
         }}
       >
         <Image
@@ -69,7 +72,7 @@ const FoodCard = ({ name, image }) => {
         style={{
           fontSize: 14,
           fontWeight: "600",
-          color: "#003A00",
+          color: theme.primaryText,
           textAlign: "center",
           lineHeight: 18,
         }}
@@ -81,25 +84,30 @@ const FoodCard = ({ name, image }) => {
 };
 
 // --------------------- Horizontal Food Card Scroll ------------------------
-const FoodCards = () => (
-  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-    {Object.values(meals).map((meal, idx) => (
-      <View
-        key={meal.name}
-        style={{
-          marginLeft: idx === 0 ? 2 : 0,
-          marginRight: idx === Object.values(meals).length - 1 ? 2 : 12,
-        }}
-      >
-        <FoodCard name={meal.name} image={meal.image} />
-      </View>
-    ))}
-  </ScrollView>
-);
+const FoodCards = () => {
+  const { theme } = useTheme();
+  
+  return (
+    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+      {Object.values(meals).map((meal, idx) => (
+        <View
+          key={meal.name}
+          style={{
+            marginLeft: idx === 0 ? 2 : 0,
+            marginRight: idx === Object.values(meals).length - 1 ? 2 : 12,
+          }}
+        >
+          <FoodCard name={meal.name} image={meal.image} />
+        </View>
+      ))}
+    </ScrollView>
+  );
+};
 
 // --------------------- Grid of Food Images ------------------------
 export const FoodCard2 = React.memo(() => {
   const navigation = useNavigation();
+  const { theme } = useTheme();
   
   const handleFoodPress = useCallback((food) => {
     navigation.navigate("MealCard", { 
@@ -132,14 +140,14 @@ export const FoodCard2 = React.memo(() => {
             aspectRatio: 1,
             borderRadius: 20,
             overflow: "hidden",
-            backgroundColor: "#fff",
-            shadowColor: "#003A00",
+            backgroundColor: theme.cardBackground,
+            shadowColor: theme.shadow,
             shadowOffset: { width: 0, height: 10 },
             shadowOpacity: 0.35,
             shadowRadius: 15,
             elevation: 15,
             borderWidth: 1,
-            borderColor: "#003A00",
+            borderColor: theme.border,
           }}
         >
           <Image
@@ -173,7 +181,7 @@ export const FoodCard2 = React.memo(() => {
               alignItems: "center",
             }}
           >
-            <Text style={{ fontSize: 12, fontWeight: "bold", color: "#003A00" }}>
+            <Text style={{ fontSize: 12, fontWeight: "bold", color: theme.darkGreen }}>
               ⭐ {food.rating}
             </Text>
           </View>
@@ -205,7 +213,7 @@ export const FoodCard2 = React.memo(() => {
         </View>
       </TouchableOpacity>
     ));
-  }, [handleFoodPress]);
+  }, [handleFoodPress, theme]);
 
   return (
     <ScrollView
@@ -238,6 +246,7 @@ export const Detailedfoodlist = React.memo(() => {
   const route = useRoute();
   const navigation = useNavigation();
   const mealName = route.params?.mealName || "";
+  const { theme } = useTheme();
 
   const filteredFoods = useMemo(() => {
     return FoodData.filter((food) =>
@@ -280,10 +289,10 @@ export const Detailedfoodlist = React.memo(() => {
             aspectRatio: 1,
             borderRadius: 20,
             borderWidth: 1,
-            borderColor: "#003A00",
+            borderColor: theme.border,
             overflow: "hidden",
-            backgroundColor: "#fff",
-            shadowColor: "#003A00",
+            backgroundColor: theme.cardBackground,
+            shadowColor: theme.shadow,
             shadowOffset: { width: 0, height: 8 },
             shadowOpacity: 0.3,
             shadowRadius: 12,
@@ -341,18 +350,18 @@ export const Detailedfoodlist = React.memo(() => {
             fontWeight: "600",
             marginTop: 8,
             textAlign: "center",
-            color: "#003A00",
+            color: theme.primaryText,
           }}
         >
           ⭐ {food.rating}
         </Text>
       </View>
     ));
-  }, [filteredFoods, handleFoodPress]);
+  }, [filteredFoods, handleFoodPress, theme]);
 
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor: "#D9ECD9" }}
+      style={{ flex: 1, backgroundColor: theme.primaryBackground }}
       contentContainerStyle={{
         paddingHorizontal: 8,
         paddingTop: "10%",
@@ -363,12 +372,12 @@ export const Detailedfoodlist = React.memo(() => {
       windowSize={10}
       initialNumToRender={6}
     >
-      <View className="flex-row justify-between items-center mb-4">
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <Text
           style={{
             fontSize: 24,
             fontWeight: "bold",
-            color: "#003A00",
+            color: theme.primaryText,
             textTransform: "capitalize",
           }}
         >
@@ -376,10 +385,10 @@ export const Detailedfoodlist = React.memo(() => {
         </Text>
         <TouchableOpacity
           onPress={handleGoBack}
-          className="flex-row items-center"
+          style={{ flexDirection: 'row', alignItems: 'center' }}
         >
-          <AntDesign name="left" size={24} color="#008000" />
-          <Text style={{ fontSize: 18, color: "#008000" }}>Back</Text>
+          <AntDesign name="left" size={24} color={theme.primaryGreen} />
+          <Text style={{ fontSize: 18, color: theme.primaryGreen }}>Back</Text>
         </TouchableOpacity>
       </View>
 
@@ -394,7 +403,7 @@ export const Detailedfoodlist = React.memo(() => {
           foodCards
         ) : (
           <View style={{ flex: 1, alignItems: "center", padding: 20 }}>
-            <Text style={{ fontSize: 16, color: "#888" }}>
+            <Text style={{ fontSize: 16, color: theme.tertiaryText }}>
               No foods found for {mealName || "this meal"}.
             </Text>
           </View>
@@ -406,61 +415,69 @@ export const Detailedfoodlist = React.memo(() => {
 
 // --------------------- Grid Layout Addable Card ------------------------
 export const FoodCard3 = ({ cardName, image = [], text, onPress, onLongPress }) => {
+  const { theme } = useTheme();
+  
   return (
-    <View className="bg-[#D9ECD9] flex-1 px-4 pt-10">
+    <View style={{ backgroundColor: theme.primaryBackground, flex: 1, paddingHorizontal: 16, paddingTop: 40 }}>
       <TouchableOpacity
-        className="rounded-xl border border-[#003A00] p-1"
-        style={{ width: 180, height: 150 }}
+        style={{ 
+          borderRadius: 12, 
+          borderWidth: 1, 
+          borderColor: theme.border, 
+          padding: 4, 
+          width: 180, 
+          height: 150 
+        }}
         activeOpacity={0.9}
         onPress={onPress}
         onLongPress={onLongPress}
       >
         {/* Image Grid */}
-        <View className="flex-row flex-1">
+        <View style={{ flexDirection: 'row', flex: 1 }}>
           {/* Left Large Image */}
-          <View className="w-[50%] mr-1 bg-gray-200 rounded-lg overflow-hidden">
+          <View style={{ width: '50%', marginRight: 4, backgroundColor: theme.tertiaryBackground, borderRadius: 8, overflow: 'hidden' }}>
             {image[0] ? (
               <Image
                 source={{ uri: image[0] }}
-                className="w-full h-full"
+                style={{ width: '100%', height: '100%' }}
                 resizeMode="cover"
               />
             ) : (
-              <View className="w-full h-full bg-gray-300" />
+              <View style={{ width: '100%', height: '100%', backgroundColor: theme.tertiaryBackground }} />
             )}
           </View>
 
           {/* Right Stacked Images */}
-          <View className="w-[48%] justify-between">
-            <View className="h-[48%] bg-gray-200 rounded-lg overflow-hidden mb-1">
+          <View style={{ width: '48%', justifyContent: 'space-between' }}>
+            <View style={{ height: '48%', backgroundColor: theme.tertiaryBackground, borderRadius: 8, overflow: 'hidden', marginBottom: 4 }}>
               {image[1] ? (
                 <Image
                   source={{ uri: image[1] }}
-                  className="w-full h-full"
+                  style={{ width: '100%', height: '100%' }}
                   resizeMode="cover"
                 />
               ) : (
-                <View className="w-full h-full bg-gray-300" />
+                <View style={{ width: '100%', height: '100%', backgroundColor: theme.tertiaryBackground }} />
               )}
             </View>
-            <View className="h-[48%] bg-gray-200 rounded-lg overflow-hidden">
+            <View style={{ height: '48%', backgroundColor: theme.tertiaryBackground, borderRadius: 8, overflow: 'hidden' }}>
               {image[2] ? (
                 <Image
                   source={{ uri: image[2] }}
-                  className="w-full h-full"
+                  style={{ width: '100%', height: '100%' }}
                   resizeMode="cover"
                 />
               ) : (
-                <View className="w-full h-full bg-gray-300" />
+                <View style={{ width: '100%', height: '100%', backgroundColor: theme.tertiaryBackground }} />
               )}
             </View>
           </View>
         </View>
 
         {/* Footer Text */}
-        <View className="mt-2">
-          <Text className="text-base font-semibold text-black">{cardName || "Cookbook"}</Text>
-          <Text className="text-xs text-gray-700">{text || "0 Recipes"}</Text>
+        <View style={{ marginTop: 8 }}>
+          <Text style={{ fontSize: 16, fontWeight: '600', color: theme.primaryText }}>{cardName || "Cookbook"}</Text>
+          <Text style={{ fontSize: 12, color: theme.secondaryText }}>{text || "0 Recipes"}</Text>
         </View>
       </TouchableOpacity>
     </View>

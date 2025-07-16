@@ -1,19 +1,21 @@
 import { Fontisto } from "@expo/vector-icons";
 import { useNavigation } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
-    Image,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Image,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import foodList from "../FoodData";
+import { useTheme } from '../theme.jsx';
 
 const Search = ({ searchType = "food", cookbooks = [], setCookbooks = () => {} }) => {
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState("");
+  const { theme } = useTheme();
 
   // Filter based on search type
   const filteredResults = searchType === "cookbooks" 
@@ -55,19 +57,19 @@ const Search = ({ searchType = "food", cookbooks = [], setCookbooks = () => {} }
   };
 
   return (
-    <View className="bg-[#D9ECD9] pt-10">
+    <View style={{ backgroundColor: theme.primaryBackground, paddingTop: 40 }}>
       {/* Search Input with Icon */}
-      <View className="mx-4 mb-4 relative">
+      <View style={{ marginHorizontal: 16, marginBottom: 16, position: 'relative' }}>
         <View style={{
-          backgroundColor: '#ffffff',
+          backgroundColor: theme.secondaryBackground,
           borderRadius: 20,
-          shadowColor: "#000",
+          shadowColor: theme.shadow,
           shadowOffset: { width: 0, height: 4 },
           shadowOpacity: 0.15,
           shadowRadius: 8,
           elevation: 6,
           borderWidth: 2,
-          borderColor: '#008000',
+          borderColor: theme.primaryGreen,
         }}>
           <TextInput
             style={{
@@ -75,10 +77,10 @@ const Search = ({ searchType = "food", cookbooks = [], setCookbooks = () => {} }
               paddingRight: 16,
               paddingVertical: 16,
               fontSize: 16,
-              color: '#003A00',
+              color: theme.primaryText,
             }}
             placeholder={getPlaceholderText()}
-            placeholderTextColor="#888"
+            placeholderTextColor={theme.inputPlaceholder}
             value={searchQuery}
             onChangeText={setSearchQuery}
             returnKeyType="search"
@@ -90,7 +92,7 @@ const Search = ({ searchType = "food", cookbooks = [], setCookbooks = () => {} }
           <Fontisto
             name="search"
             size={20}
-            color="#008000"
+            color={theme.primaryGreen}
             style={{
               position: "absolute",
               top: 16,
@@ -110,36 +112,36 @@ const Search = ({ searchType = "food", cookbooks = [], setCookbooks = () => {} }
             <TouchableOpacity
               key={searchType === "cookbooks" ? index : item.id}
               style={{
-                backgroundColor: '#ffffff',
+                backgroundColor: theme.cardBackground,
                 borderRadius: 16,
                 padding: 16,
                 marginBottom: 12,
                 marginHorizontal: 16,
-                shadowColor: "#000",
+                shadowColor: theme.shadow,
                 shadowOffset: { width: 0, height: 3 },
                 shadowOpacity: 0.1,
                 shadowRadius: 6,
                 elevation: 4,
                 borderLeftWidth: 4,
-                borderLeftColor: '#008000',
+                borderLeftColor: theme.primaryGreen,
               }}
               onPress={() => handleItemPress(item)}
             >
-              <View className="flex-row items-center">
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 {searchType === "cookbooks" ? (
                   // Cookbook display
                   <View style={{
                     width: 60,
                     height: 60,
                     borderRadius: 30,
-                    backgroundColor: '#e8f5e8',
+                    backgroundColor: theme.lightGreen,
                     alignItems: 'center',
                     justifyContent: 'center',
                     marginRight: 16,
                     borderWidth: 2,
-                    borderColor: '#008000',
+                    borderColor: theme.primaryGreen,
                   }}>
-                    <Fontisto name="bookmark" size={24} color="#008000" />
+                    <Fontisto name="bookmark" size={24} color={theme.primaryGreen} />
                   </View>
                 ) : (
                   // Food display
@@ -150,7 +152,7 @@ const Search = ({ searchType = "food", cookbooks = [], setCookbooks = () => {} }
                     overflow: 'hidden',
                     marginRight: 16,
                     borderWidth: 2,
-                    borderColor: '#008000',
+                    borderColor: theme.primaryGreen,
                   }}>
                     <Image
                       source={{ uri: item.image }}
@@ -162,14 +164,14 @@ const Search = ({ searchType = "food", cookbooks = [], setCookbooks = () => {} }
                   <Text style={{
                     fontSize: 18,
                     fontWeight: 'bold',
-                    color: '#003A00',
+                    color: theme.primaryText,
                     marginBottom: 4,
                   }}>
                     {searchType === "cookbooks" ? item.title : item.name}
                   </Text>
                   <Text style={{
                     fontSize: 14,
-                    color: '#008000',
+                    color: theme.primaryGreen,
                     fontWeight: '500',
                   }}>
                     {searchType === "cookbooks" 
@@ -179,7 +181,7 @@ const Search = ({ searchType = "food", cookbooks = [], setCookbooks = () => {} }
                   </Text>
                 </View>
                 <View style={{
-                  backgroundColor: '#e8f5e8',
+                  backgroundColor: theme.lightGreen,
                   paddingHorizontal: 8,
                   paddingVertical: 4,
                   borderRadius: 12,
@@ -187,7 +189,7 @@ const Search = ({ searchType = "food", cookbooks = [], setCookbooks = () => {} }
                   <Fontisto 
                     name={searchType === "cookbooks" ? "arrow-right" : "arrow-right"} 
                     size={16} 
-                    color="#008000" 
+                    color={theme.primaryGreen} 
                   />
                 </View>
               </View>
@@ -204,18 +206,18 @@ const Search = ({ searchType = "food", cookbooks = [], setCookbooks = () => {} }
           marginHorizontal: 16,
         }}>
           <View style={{
-            backgroundColor: '#e8f5e8',
+            backgroundColor: theme.lightGreen,
             padding: 20,
             borderRadius: 16,
             alignItems: 'center',
             borderWidth: 2,
-            borderColor: '#008000',
+            borderColor: theme.primaryGreen,
           }}>
-            <Fontisto name="search" size={40} color="#008000" />
+            <Fontisto name="search" size={40} color={theme.primaryGreen} />
             <Text style={{
               fontSize: 16,
               fontWeight: 'bold',
-              color: '#003A00',
+              color: theme.primaryText,
               marginTop: 8,
               textAlign: 'center',
             }}>
@@ -223,7 +225,7 @@ const Search = ({ searchType = "food", cookbooks = [], setCookbooks = () => {} }
             </Text>
             <Text style={{
               fontSize: 14,
-              color: '#008000',
+              color: theme.primaryGreen,
               marginTop: 4,
               textAlign: 'center',
             }}>

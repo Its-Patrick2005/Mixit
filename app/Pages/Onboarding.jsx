@@ -16,14 +16,18 @@ import {
 import Button from "../Components/Button";
 import GetToKnowUs from "../Components/GetToKnowUs";
 import Review from "../Components/Review";
+import { useTheme } from '../theme.jsx';
+
 const { width } = Dimensions.get("window");
 const FRAME_WIDTH = width * 0.6;
 const FRAME_HEIGHT = FRAME_WIDTH * 2;
 
 const Onboarding = () => {
   const navigation = useNavigation();
+  const { theme } = useTheme();
+  
   return (
-    <View className="flex-1 items-center py-[10%] bg-[#B0D8B0] px-3 ">
+    <View style={[styles.container, { backgroundColor: theme.primaryBackground }]}>
       <View
         className="rounded-full overflow-hidden"
         style={{ width: "30%", aspectRatio: 1, alignSelf: "center" }}>
@@ -35,8 +39,8 @@ const Onboarding = () => {
       </View>
 
       <View>
-        <Text className="text-2xl font-bold text-center">Welcome to Mixit</Text>
-        <Text className="text-lg text-gray-500  text-center">
+        <Text style={[styles.title, { color: theme.primaryText }]}>Welcome to Mixit</Text>
+        <Text style={[styles.subtitle, { color: theme.secondaryText }]}>
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi,
           sapiente voluptatum. Blanditiis, numquam corporis exercitationem
         </Text>
@@ -56,69 +60,52 @@ const Onboarding = () => {
         onPress={() => navigation.navigate("Onboard1")}
       />
       <View className="mt-4 flex-row">
-        <Text className="text-xl">Already have an account?</Text>
+        <Text style={[styles.loginText, { color: theme.primaryText }]}>Already have an account?</Text>
         <TouchableOpacity
           className=""
           onPress={() => navigation.navigate("Login2")}>
-          <Text className="text-[#008000] text-xl"> Log in</Text>
+          <Text style={[styles.loginLink, { color: theme.primaryGreen }]}> Log in</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 };
-const styles = StyleSheet.create({
-  container: {
-    width: FRAME_WIDTH,
-    height: FRAME_HEIGHT,
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-  },
-  video: {
-    position: "absolute",
-    width: FRAME_WIDTH * 0.88,
-    height: FRAME_HEIGHT * 0.92,
-    top: FRAME_HEIGHT * 0.04,
-    left: FRAME_WIDTH * 0.06,
-    borderRadius: 24,
-    backgroundColor: "#ffffff",
-  },
-  frame: {
-    position: "absolute",
-    width: FRAME_WIDTH,
-    height: FRAME_HEIGHT,
-  },
-});
 
 // Second login page
 
 export const Onboard1 = () => {
   const navigation = useNavigation();
+  const { theme } = useTheme();
   const reviews = [
     {
       name: "Sarah J.",
       text: "Mixit made cooking so much easier! The recipes are simple and delicious.",
       rating: 5,
+      image:"https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/GBAJWSUV3EI6RAML5G3TJDGYPU.jpg"
     },
     {
       name: "Mike T.",
       text: "I love the step-by-step guides. My family enjoys every meal I make now.",
       rating: 4,
+      image:"https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/GBAJWSUV3EI6RAML5G3TJDGYPU.jpg"
     },
     {
       name: "Priya S.",
       text: "Great app for beginners and pros alike. Highly recommended!",
       rating: 5,
+      image:"https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/GBAJWSUV3EI6RAML5G3TJDGYPU.jpg"
     },
     {
       name: "Carlos R.",
       text: "The grocery list feature saves me so much time. Thank you Mixit!",
       rating: 4,
+      image:"https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/GBAJWSUV3EI6RAML5G3TJDGYPU.jpg"
     },
     {
       name: "Emily W.",
       text: "Beautiful design and easy to use. My go-to cooking app.",
       rating: 5,
+      image:"https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/GBAJWSUV3EI6RAML5G3TJDGYPU.jpg"
     },
   ];
   const flatListRef = useRef(null);
@@ -133,7 +120,7 @@ export const Onboard1 = () => {
   });
 
   return (
-    <View className="flex-1 items-center py-[10%] bg-[#D9ECD9] px-3 ">
+    <View style={[styles.container, { backgroundColor: theme.primaryBackground }]}>
       {/* Loading Header */}
       <View>
         <View
@@ -145,18 +132,18 @@ export const Onboard1 = () => {
             resizeMode="contain"
           />
         </View>
-        <View className="bg-white w-80 h-3 relative rounded-[30px] overflow-hidden mt-3">
-          <View className="absolute bg-[#008000] w-20 h-3 rounded-[30px] " />
+        <View style={[styles.progressBar, { backgroundColor: theme.tertiaryBackground }]}>
+          <View style={[styles.progressFill, { backgroundColor: theme.primaryGreen, width: '20%' }]} />
         </View>
       </View>
 
       {/* loading Header */}
 
       <View className="mt-10">
-        <Text className="text-center text-xl font-bold capitalize">
+        <Text style={[styles.heading, { color: theme.primaryText }]}>
           WE HAVE HELPED 5+ MILLION COOKS
         </Text>
-        <Text className="text-center mt-10">
+        <Text style={[styles.description, { color: theme.secondaryText }]}>
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi,
           sapiente voluptatum. Blanditiis, numquam corporis exercitationem
         </Text>
@@ -171,7 +158,7 @@ export const Onboard1 = () => {
           showsHorizontalScrollIndicator={false}
           keyExtractor={(_, idx) => idx.toString()}
           renderItem={({ item }) => (
-            <Review name={item.name} text={item.text} ratings={item.rating} />
+            <Review name={item.name} text={item.text} ratings={item.rating} image={item.image} />
           )}
           ItemSeparatorComponent={() => <View style={{ width: 12 }} />}
           style={{ flexGrow: 0 }}
@@ -190,6 +177,7 @@ export const Onboard1 = () => {
 
 export const Onboard2 = () => {
   const navigation = useNavigation();
+  const { theme } = useTheme();
   const platforms = [
     {
       name: "YouTube",
@@ -229,7 +217,7 @@ export const Onboard2 = () => {
   const [selectedOptions, setSelectedOptions] = React.useState([]);
 
   return (
-    <View className="flex-1 items-center py-[10%] bg-[#D9ECD9] px-3 ">
+    <View style={[styles.container, { backgroundColor: theme.primaryBackground }]}>
       {/* Header */}
       <View>
         <View
@@ -241,15 +229,15 @@ export const Onboard2 = () => {
             resizeMode="contain"
           />
         </View>
-        <View className="bg-white w-80 h-3 relative rounded-[30px] overflow-hidden mt-3">
-          <View className="absolute bg-[#008000] w-36 h-3 rounded-[30px] " />
+        <View style={[styles.progressBar, { backgroundColor: theme.tertiaryBackground }]}>
+          <View style={[styles.progressFill, { backgroundColor: theme.primaryGreen, width: '36%' }]} />
         </View>
       </View>
 
       {/* page */}
 
       <View className="mt-10">
-        <Text className="text-center text-xl font-bold capitalize">
+        <Text style={[styles.heading, { color: theme.primaryText }]}>
           how did you hear about us
         </Text>
       </View>
@@ -278,6 +266,7 @@ export const Onboard2 = () => {
 // fourth login page
 export const Onboard3 = () => {
   const navigation = useNavigation();
+  const { theme } = useTheme();
   const platforms = [
     {
       name: "YouTube",
@@ -316,7 +305,7 @@ export const Onboard3 = () => {
   ];
   const [selectedOptions, setSelectedOptions] = React.useState([]);
   return (
-    <View className="flex-1 items-center py-[10%] bg-[#D9ECD9] px-3 ">
+    <View style={[styles.container, { backgroundColor: theme.primaryBackground }]}>
       {/* Header */}
       <View>
         <View
@@ -328,21 +317,21 @@ export const Onboard3 = () => {
             resizeMode="contain"
           />
         </View>
-        <View className="bg-white w-80 h-3 relative rounded-[30px] overflow-hidden mt-3">
-          <View className="absolute bg-[#008000] w-60 h-3 rounded-[30px] " />
+        <View style={[styles.progressBar, { backgroundColor: theme.tertiaryBackground }]}>
+          <View style={[styles.progressFill, { backgroundColor: theme.primaryGreen, width: '60%' }]} />
         </View>
       </View>
 
       {/* page */}
 
       <View className="mt-10">
-        <Text className="text-center text-xl font-bold capitalize">
+        <Text style={[styles.heading, { color: theme.primaryText }]}>
           where do you get your
         </Text>
-        <Text className="text-center text-xl font-bold capitalize">
+        <Text style={[styles.heading, { color: theme.primaryText }]}>
           recipes from
         </Text>
-        <Text className="text-center mt-5 capitalize">Select all to apply</Text>
+        <Text style={[styles.subtitle, { color: theme.secondaryText }]}>Select all to apply</Text>
       </View>
 
       {/* List */}
@@ -372,6 +361,7 @@ export const Onboard4 = () => {
   const [continueButtonVisible, setContinueButtonVisible] = useState(false);
   const spinValue = new Animated.Value(0);
   const navigation = useNavigation();
+  const { theme } = useTheme();
   const hasAnimated = useRef(false); // Track if animation has run
 
   useEffect(() => {
@@ -394,7 +384,7 @@ export const Onboard4 = () => {
   }, []); // Empty dependency array ensures effect runs once on mount
 
   return (
-    <View className="flex-1 items-center py-[10%] bg-[#D9ECD9] px-3">
+    <View style={[styles.container, { backgroundColor: theme.primaryBackground }]}>
       {/* Header */}
       <View>
         <View
@@ -406,20 +396,20 @@ export const Onboard4 = () => {
             resizeMode="contain"
           />
         </View>
-        <View className="bg-white w-80 h-3 relative rounded-[30px] overflow-hidden mt-3">
-          <View className="absolute bg-[#008000] w-80 h-3 rounded-[30px]" />
+        <View style={[styles.progressBar, { backgroundColor: theme.tertiaryBackground }]}>
+          <View style={[styles.progressFill, { backgroundColor: theme.primaryGreen, width: '100%' }]} />
         </View>
       </View>
 
       {/* Page */}
       <View className="mt-10">
-        <Text className="text-center text-xl font-bold capitalize">
+        <Text style={[styles.heading, { color: theme.primaryText }]}>
           where do you get your
         </Text>
-        <Text className="text-center text-xl font-bold capitalize">
+        <Text style={[styles.heading, { color: theme.primaryText }]}>
           recipes from
         </Text>
-        <Text className="text-center mt-5 capitalize">Select all to apply</Text>
+        <Text style={[styles.subtitle, { color: theme.secondaryText }]}>Select all to apply</Text>
       </View>
 
       <Animated.View
@@ -443,10 +433,10 @@ export const Onboard4 = () => {
       {/* Loading Text and Animation */}
       {!continueButtonVisible && (
         <View className="mt-5 flex-row items-center">
-          <Text className="text-center text-lg capitalize mr-2">
+          <Text style={[styles.loadingText, { color: theme.primaryText }]}>
             Preparing features just for you
           </Text>
-          <ActivityIndicator size="small" color="#008000" />
+          <ActivityIndicator size="small" color={theme.primaryGreen} />
         </View>
       )}
 
@@ -459,5 +449,70 @@ export const Onboard4 = () => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: '10%',
+    paddingHorizontal: 12,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 18,
+    textAlign: 'center',
+  },
+  heading: {
+    textAlign: 'center',
+    fontSize: 20,
+    fontWeight: 'bold',
+    textTransform: 'capitalize',
+  },
+  description: {
+    textAlign: 'center',
+    marginTop: 10,
+  },
+  loginText: {
+    fontSize: 20,
+  },
+  loginLink: {
+    fontSize: 20,
+  },
+  loadingText: {
+    textAlign: 'center',
+    fontSize: 18,
+    textTransform: 'capitalize',
+    marginRight: 8,
+  },
+  progressBar: {
+    width: 320,
+    height: 12,
+    borderRadius: 30,
+    overflow: 'hidden',
+    marginTop: 12,
+  },
+  progressFill: {
+    height: 12,
+    borderRadius: 30,
+  },
+  video: {
+    position: "absolute",
+    width: FRAME_WIDTH * 0.88,
+    height: FRAME_HEIGHT * 0.92,
+    top: FRAME_HEIGHT * 0.04,
+    left: FRAME_WIDTH * 0.06,
+    borderRadius: 24,
+    backgroundColor: "#ffffff",
+  },
+  frame: {
+    position: "absolute",
+    width: FRAME_WIDTH,
+    height: FRAME_HEIGHT,
+  },
+});
 
 export default Onboarding;

@@ -2,60 +2,136 @@ import Foundation from '@expo/vector-icons/Foundation';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useNavigation } from "expo-router";
-import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { useState } from "react";
+import { Alert, Text, TouchableOpacity, View } from "react-native";
+import { useTheme } from '../theme.jsx';
+import ImportPopUp from "./ImportPopUp";
 
 const ImportTab = ({ currentPage = "Home" }) => {
   const navigation = useNavigation();
+  const [showImportPopup, setShowImportPopup] = useState(false);
+  const { theme } = useTheme();
 
   const getTabStyle = (pageName) => {
     const isActive = currentPage === pageName;
     return {
-      container: `items-center ${isActive ? 'scale-110' : ''}`,
-      icon: isActive ? "#008000" : "#003A00",
-      text: `text-sm mt-2 ${isActive ? 'text-[#008000] font-bold' : 'text-[#003A00]'}`
+      container: {
+        alignItems: 'center',
+        transform: [{ scale: isActive ? 1.1 : 1 }],
+      },
+      icon: isActive ? theme.primaryGreen : theme.navInactive,
+      text: {
+        fontSize: 14,
+        marginTop: 8,
+        color: isActive ? theme.primaryGreen : theme.navInactive,
+        fontWeight: isActive ? 'bold' : 'normal',
+      }
     };
   };
 
+  const handleWriteFromScratch = () => {
+    try {
+      console.log('ImportTab: Navigating to UserInput');
+      setShowImportPopup(false);
+      navigation.navigate("UserInput");
+    } catch (error) {
+      console.error('ImportTab: Error navigating to UserInput:', error);
+      Alert.alert('Error', 'Failed to open recipe editor. Please try again.');
+    }
+  };
+
+  const handleAddButtonPress = () => {
+    try {
+      console.log('ImportTab: Opening import popup');
+      setShowImportPopup(true);
+    } catch (error) {
+      console.error('ImportTab: Error opening import popup:', error);
+      Alert.alert('Error', 'Failed to open import options. Please try again.');
+    }
+  };
+
+  const handleCloseImportPopup = () => {
+    try {
+      console.log('ImportTab: Closing import popup');
+      setShowImportPopup(false);
+    } catch (error) {
+      console.error('ImportTab: Error closing import popup:', error);
+    }
+  };
+
+  const handleNavigation = (routeName) => {
+    try {
+      console.log('ImportTab: Navigating to', routeName);
+      navigation.navigate(routeName);
+    } catch (error) {
+      console.error('ImportTab: Error navigating to', routeName, ':', error);
+      Alert.alert('Error', `Failed to navigate to ${routeName}. Please try again.`);
+    }
+  };
+
   return (
-    <View className="flex-row justify-between p-6 relative">
-      <TouchableOpacity 
-        className={getTabStyle("Home").container}
-        onPress={() => navigation.navigate("Home")} 
-      >
-        <Foundation name="home" size={30} color={getTabStyle("Home").icon} />
-        <Text className={getTabStyle("Home").text}>Home</Text>
-      </TouchableOpacity>
-      
-      <TouchableOpacity 
-        className={getTabStyle("Recipe").container}
-        onPress={() => navigation.navigate("Recipe")}
-      >
-        <Ionicons name="receipt-outline" size={30} color={getTabStyle("Recipe").icon} />
-        <Text className={getTabStyle("Recipe").text}>Receipts</Text>
-      </TouchableOpacity>
-      
-      <TouchableOpacity className="items-center absolute -top-8 left-[55%] transform -translate-x-[50%]" >
-        <Ionicons name="add-circle-sharp" size={70} color="#003A00" />
-        <Text className="text-sm text-[#003A00]">Add</Text>
-      </TouchableOpacity>
-      
-      <TouchableOpacity 
-        className={getTabStyle("MealPlan").container}
-        onPress={() => navigation.navigate("MealPlan")}
-      >
-        <MaterialIcons name="schedule" size={30} color={getTabStyle("MealPlan").icon} />
-        <Text className={getTabStyle("MealPlan").text}>Schedule</Text>
-      </TouchableOpacity>
-      
-      <TouchableOpacity 
-        className={getTabStyle("Groceries").container}
-        onPress={() => navigation.navigate("Groceries")}
-      >
-        <MaterialIcons name="local-grocery-store" size={30} color={getTabStyle("Groceries").icon} />
-        <Text className={getTabStyle("Groceries").text}>Store</Text>
-      </TouchableOpacity>
-    </View>
+    <>
+      <View style={{ 
+        flexDirection: 'row', 
+        justifyContent: 'space-between', 
+        padding: 24, 
+        position: 'relative',
+        backgroundColor: !theme.isDarkMode && theme.lightGreen ? theme.lightGreen : theme.navBackground,
+        borderTopWidth: 1,
+        borderTopColor: theme.borderLight,
+      }}>
+        <TouchableOpacity 
+          style={getTabStyle("Home").container}
+          onPress={() => handleNavigation("Home")} 
+        >
+          <Foundation name="home" size={30} color={getTabStyle("Home").icon} />
+          <Text style={getTabStyle("Home").text}>Home</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={getTabStyle("Recipe").container}
+          onPress={() => handleNavigation("Recipe")}
+        >
+          <Ionicons name="receipt-outline" size={30} color={getTabStyle("Recipe").icon} />
+          <Text style={getTabStyle("Recipe").text}>Recipes</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={{ 
+            alignItems: 'center', 
+            position: 'absolute', 
+            top: -32, 
+            left: '55%', 
+            transform: [{ translateX: -35 }] 
+          }}
+          onPress={handleAddButtonPress}
+        >
+          <Ionicons name="add-circle-sharp" size={70} color={theme.primaryGreen} />
+          <Text style={{ fontSize: 14, color: theme.primaryText }}>Add</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={getTabStyle("MealPlan").container}
+          onPress={() => handleNavigation("MealPlan")}
+        >
+          <MaterialIcons name="schedule" size={30} color={getTabStyle("MealPlan").icon} />
+          <Text style={getTabStyle("MealPlan").text}>Schedule</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={getTabStyle("Groceries").container}
+          onPress={() => handleNavigation("Groceries")}
+        >
+          <MaterialIcons name="local-grocery-store" size={30} color={getTabStyle("Groceries").icon} />
+          <Text style={getTabStyle("Groceries").text}>Store</Text>
+        </TouchableOpacity>
+      </View>
+      <ImportPopUp 
+        visible={showImportPopup} 
+        onClose={handleCloseImportPopup} 
+        onWriteFromScratch={handleWriteFromScratch}
+      />
+    </>
   );
 };
 

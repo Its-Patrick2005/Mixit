@@ -1,63 +1,80 @@
-import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import { useTheme } from '../theme.jsx';
 
 const GetToKnowUs = ({ name, icon, selectedOptions, setSelectedOptions }) => {
-  const [isPressed, setIsPressed] = React.useState(false);
-  const [isActive, setIsActive] = React.useState(false);
-
+  const { theme } = useTheme();
+  
   const handlePressIn = () => {
-    setIsPressed(true);
+    // Add press in animation if needed
   };
 
   const handlePressOut = () => {
-    setIsPressed(false);
+    // Add press out animation if needed
   };
 
   const handlePress = () => {
-    const isSelected = selectedOptions.includes(name);
-    if (isSelected) {
+    if (selectedOptions.includes(name)) {
       setSelectedOptions(selectedOptions.filter((option) => option !== name));
     } else {
       setSelectedOptions([...selectedOptions, name]);
     }
   };
 
-  React.useEffect(() => {
-    setIsActive(selectedOptions.includes(name));
-  }, [selectedOptions, name]);
+  const isSelected = selectedOptions.includes(name);
 
   return (
     <TouchableOpacity
-      activeOpacity={1}
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: isPressed || isActive ? "#388E3C" : "#B0D8B0",
-        borderRadius: 9999,
-        paddingVertical: 12,
-        paddingHorizontal: 80,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: isPressed || isActive ? 4 : 1 },
-        shadowOpacity: isPressed || isActive ? 0.25 : 0.1,
-        shadowRadius: isPressed || isActive ? 6 : 2,
-        marginVertical: 2,
-        minWidth: 200,
-        elevation: isPressed || isActive ? 6 : 2,
-        transform: [{ translateY: isPressed || isActive ? 2 : 0 }],
-      }}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
-      onPress={handlePress}>
-      {icon && <View style={{ marginRight: 12 }}>{icon}</View>}
+      onPress={handlePress}
+      style={{
+        backgroundColor: isSelected ? theme.lightGreen : theme.cardBackground,
+        borderWidth: 1,
+        borderColor: isSelected ? theme.primaryGreen : theme.border,
+        borderRadius: 12,
+        padding: 20,
+        flexDirection: "row",
+        alignItems: "center",
+        shadowColor: theme.shadow,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: isSelected ? 0.2 : 0.1,
+        shadowRadius: 4,
+        elevation: isSelected ? 4 : 2,
+        minHeight: 60,
+        width: '100%',
+      }}
+    >
+      {icon && <View style={{ marginRight: 16, minWidth: 24 }}>{icon}</View>}
       <Text
         style={{
           fontSize: 16,
-          fontWeight: "600",
-          color: isPressed || isActive ? "#fff" : "#222",
-        
-        }}>
+          fontWeight: isSelected ? "600" : "400",
+          color: isSelected ? theme.primaryGreen : theme.primaryText,
+          flex: 1,
+          textAlign: 'left',
+        }}
+      >
         {name}
       </Text>
+      <View
+        style={{
+          width: 20,
+          height: 20,
+          borderRadius: 10,
+          borderWidth: 2,
+          borderColor: isSelected ? theme.primaryGreen : theme.borderLight,
+          backgroundColor: isSelected ? theme.primaryGreen : 'transparent',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginLeft: 12,
+        }}
+      >
+        {isSelected && (
+          <Text style={{ color: theme.inverseText, fontSize: 12, fontWeight: 'bold' }}>
+            ✓
+          </Text>
+        )}
+      </View>
     </TouchableOpacity>
   );
 };
