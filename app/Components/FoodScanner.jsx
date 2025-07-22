@@ -2,21 +2,20 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useEffect, useRef, useState } from 'react';
 import {
-  ActivityIndicator,
-  Alert,
-  Animated,
-  Image,
-  Modal,
-  Text,
-  TouchableOpacity,
-  View
+    ActivityIndicator,
+    Alert,
+    Animated,
+    Image,
+    Modal,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
 import foodList from '../FoodData';
 import foodRecognitionService from '../services/foodRecognition';
 import { useTheme } from '../theme.jsx';
 
 const FoodScanner = ({ visible, onClose, onFoodDetected, capturedImageUri }) => {
-  console.log('🎬 FoodScanner component rendered:', { visible, capturedImageUri });
   
   const [scanning, setScanning] = useState(false);
   const [capturedImage, setCapturedImage] = useState(null);
@@ -25,7 +24,7 @@ const FoodScanner = ({ visible, onClose, onFoodDetected, capturedImageUri }) => 
   const { theme } = useTheme();
 
   // Debug current state
-  console.log('📊 FoodScanner state:', { scanning, capturedImage, detectedFood, error });
+  // console.log('📊 FoodScanner state:', { scanning, capturedImage, detectedFood, error });
 
   // Animation values
   const scanLineAnim = useRef(new Animated.Value(0)).current;
@@ -36,34 +35,28 @@ const FoodScanner = ({ visible, onClose, onFoodDetected, capturedImageUri }) => 
 
   // Set captured image when component opens with an image
   useEffect(() => {
-    console.log('🔍 FoodScanner useEffect triggered:', { visible, capturedImageUri });
     
     if (visible && capturedImageUri) {
-      console.log('🎯 FoodScanner: Setting captured image from prop:', capturedImageUri);
       setCapturedImage(capturedImageUri);
       // Start analysis immediately
-      console.log('🚀 Starting food analysis...');
       // Ensure scanning state is set before calling analyzeFood
       setScanning(true);
       setTimeout(() => {
         analyzeFood(capturedImageUri);
       }, 100); // Small delay to ensure state is set
     } else if (visible) {
-      console.log('🔄 FoodScanner: Opening without image, resetting state');
       // Reset state when opening without image
       setCapturedImage(null);
       setDetectedFood(null);
       setError(null);
       setScanning(false);
     } else {
-      console.log('❌ FoodScanner: Modal not visible');
     }
   }, [visible, capturedImageUri]);
 
   // Reset state when modal closes
   useEffect(() => {
     if (!visible) {
-      console.log('🔄 FoodScanner: Modal closed, resetting all state');
       setCapturedImage(null);
       setDetectedFood(null);
       setError(null);
@@ -74,10 +67,8 @@ const FoodScanner = ({ visible, onClose, onFoodDetected, capturedImageUri }) => 
   // Start scanning animations when scanning begins
   useEffect(() => {
     if (scanning) {
-      console.log('🎬 Starting scanning animations...');
       startScanningAnimations();
     } else {
-      console.log('⏹️ Stopping scanning animations...');
       stopScanningAnimations();
     }
   }, [scanning]);
@@ -154,9 +145,7 @@ const FoodScanner = ({ visible, onClose, onFoodDetected, capturedImageUri }) => 
 
   const requestCameraPermission = async () => {
     try {
-      console.log('Requesting camera permission...');
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
-      console.log('Camera permission status:', status);
       
       if (status !== 'granted') {
         Alert.alert(
@@ -166,7 +155,6 @@ const FoodScanner = ({ visible, onClose, onFoodDetected, capturedImageUri }) => 
             { text: 'Cancel', style: 'cancel' },
             { text: 'Open Settings', onPress: () => {
               // This would open device settings in a real app
-              console.log('Should open device settings');
             }}
           ]
         );
@@ -174,7 +162,6 @@ const FoodScanner = ({ visible, onClose, onFoodDetected, capturedImageUri }) => 
       }
       return true;
     } catch (error) {
-      console.error('Error requesting camera permission:', error);
       Alert.alert('Error', 'Failed to request camera permission. Please try again.');
       return false;
     }
@@ -182,18 +169,15 @@ const FoodScanner = ({ visible, onClose, onFoodDetected, capturedImageUri }) => 
 
   const captureImage = async () => {
     try {
-      console.log('Starting image capture...');
       setScanning(true);
       setError(null);
       
       const hasPermission = await requestCameraPermission();
       if (!hasPermission) {
-        console.log('Camera permission denied');
         setScanning(false);
         return;
       }
 
-      console.log('Launching camera...');
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
@@ -202,18 +186,13 @@ const FoodScanner = ({ visible, onClose, onFoodDetected, capturedImageUri }) => 
         base64: false,
       });
 
-      console.log('Camera result:', result);
-
       if (!result.canceled && result.assets && result.assets[0] && result.assets[0].uri) {
-        console.log('Image captured successfully:', result.assets[0].uri);
         setCapturedImage(result.assets[0].uri);
         await analyzeFood(result.assets[0].uri);
       } else {
-        console.log('Camera cancelled or no image captured');
         setScanning(false);
       }
     } catch (error) {
-      console.error('Camera error:', error);
       setError('Failed to capture image. Please try again.');
       setScanning(false);
     }
@@ -221,53 +200,38 @@ const FoodScanner = ({ visible, onClose, onFoodDetected, capturedImageUri }) => 
 
   const analyzeFood = async (imageUri) => {
     try {
-      console.log('🔍 Starting food analysis for image:', imageUri);
-      console.log('📊 Current scanning state:', scanning);
       setError(null);
       setDetectedFood(null);
       
       // Use the food recognition service
-      console.log('📡 Calling food recognition service...');
       const detectedFoodName = await foodRecognitionService.recognizeFood(imageUri);
-      
-      console.log('✅ Food recognition result:', detectedFoodName);
       
       if (detectedFoodName) {
         // Find matching recipe in our database
-        console.log('🔍 Searching for matching recipe...');
         const matchingRecipe = findMatchingRecipe(detectedFoodName);
-        console.log('📋 Matching recipe found:', matchingRecipe);
         
         if (matchingRecipe) {
-          console.log('🎉 Success! Setting detected food:', matchingRecipe.name);
           setDetectedFood(matchingRecipe);
         } else {
-          console.log('❌ No matching recipe found for:', detectedFoodName);
           setError(`Detected "${detectedFoodName}" but no matching recipe found. Try manual input.`);
         }
       } else {
-        console.log('❌ No food detected');
         setError('Could not recognize the food. Please try again or use manual input.');
       }
     } catch (error) {
-      console.error('💥 Analysis error:', error);
       setError('Failed to analyze food. Please try again.');
     } finally {
-      console.log('🏁 Analysis complete, setting scanning to false');
       setScanning(false);
     }
   };
 
   const findMatchingRecipe = (foodName) => {
-    console.log('🔍 Finding matching recipe for:', foodName);
     if (!foodName) {
-      console.log('❌ No food name provided');
       return null;
     }
     
     // Enhanced smart matching algorithm
     const searchTerm = foodName.toLowerCase().trim();
-    console.log('🔍 Search term:', searchTerm);
     
     // First, try exact match
     let match = foodList.find(food => 
@@ -276,7 +240,6 @@ const FoodScanner = ({ visible, onClose, onFoodDetected, capturedImageUri }) => 
     );
     
     if (match) {
-      console.log('✅ Exact match found:', match.name);
       return match;
     }
     
@@ -293,7 +256,6 @@ const FoodScanner = ({ visible, onClose, onFoodDetected, capturedImageUri }) => 
     });
     
     if (match) {
-      console.log('✅ Partial match found:', match.name);
       return match;
     }
     
@@ -308,7 +270,6 @@ const FoodScanner = ({ visible, onClose, onFoodDetected, capturedImageUri }) => 
     });
     
     if (match) {
-      console.log('✅ Ingredient match found:', match.name);
       return match;
     }
     
@@ -360,10 +321,8 @@ const FoodScanner = ({ visible, onClose, onFoodDetected, capturedImageUri }) => 
     
     const category = categoryMatches[searchTerm];
     if (category) {
-      console.log('🔍 Trying category match for:', category);
       match = foodList.find(food => food.id.toLowerCase().startsWith(category));
       if (match) {
-        console.log('✅ Category match found:', match.name);
         return match;
       }
     }
@@ -387,23 +346,18 @@ const FoodScanner = ({ visible, onClose, onFoodDetected, capturedImageUri }) => 
     
     const similarWord = similarWords[searchTerm];
     if (similarWord) {
-      console.log('🔍 Trying similar word match for:', similarWord);
       match = foodList.find(food => 
         food.name.toLowerCase().includes(similarWord)
       );
       if (match) {
-        console.log('✅ Similar word match found:', match.name);
         return match;
       }
     }
     
-    console.log('❌ No match found for:', foodName);
-    console.log('📋 Available foods:', foodList.map(f => f.name));
     return null;
   };
 
   const handleRetry = () => {
-    console.log('Retrying scan...');
     setCapturedImage(null);
     setDetectedFood(null);
     setError(null);
@@ -411,14 +365,12 @@ const FoodScanner = ({ visible, onClose, onFoodDetected, capturedImageUri }) => 
 
   const handleUseRecipe = () => {
     if (detectedFood) {
-      console.log('Using detected recipe:', detectedFood.name);
       onFoodDetected(detectedFood);
       onClose();
     }
   };
 
   const handleManualInput = () => {
-    console.log('Switching to manual input');
     onClose();
     // This will trigger the paste text modal in ImportPopUp
   };
@@ -531,7 +483,6 @@ const FoodScanner = ({ visible, onClose, onFoodDetected, capturedImageUri }) => 
               {/* Test Button for Debugging */}
               <TouchableOpacity
                 onPress={() => {
-                  console.log('🧪 Test button pressed - simulating food detection');
                   // Simulate a captured image
                   const testImageUri = 'test-image-uri';
                   setCapturedImage(testImageUri);

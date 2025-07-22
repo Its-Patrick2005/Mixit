@@ -41,8 +41,8 @@ const Onboarding = () => {
       <View>
         <Text style={[styles.title, { color: theme.primaryText }]}>Welcome to Mixit</Text>
         <Text style={[styles.subtitle, { color: theme.secondaryText }]}>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi,
-          sapiente voluptatum. Blanditiis, numquam corporis exercitationem
+        “Mixit is your smart kitchen companion  discover, mix, and
+        master delicious recipes from around the world with ease. Whether you're a beginner or a pro,  Mixit helps you cook better, faster, and tastier every day!”
         </Text>
       </View>
 
@@ -404,12 +404,9 @@ export const Onboard4 = () => {
       {/* Page */}
       <View className="mt-10">
         <Text style={[styles.heading, { color: theme.primaryText }]}>
-          where do you get your
+          we are preparing features 
         </Text>
-        <Text style={[styles.heading, { color: theme.primaryText }]}>
-          recipes from
-        </Text>
-        <Text style={[styles.subtitle, { color: theme.secondaryText }]}>Select all to apply</Text>
+        <Text style={[styles.heading, { color: theme.secondaryText }]}> just for you</Text>
       </View>
 
       <Animated.View

@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Image, Text, View } from "react-native";
+import { Image as ExpoImage } from 'expo-image';
+import { useEffect, useState } from "react";
+import { Text, View } from "react-native";
 import { useTheme } from '../theme.jsx';
 
 const placeholderImage = require('../../assets/images/Logo.png');
@@ -7,6 +8,10 @@ const placeholderImage = require('../../assets/images/Logo.png');
 const Review = ({text,image,name,ratings}) => {
   const { theme } = useTheme();
   const [imageError, setImageError] = useState(false);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    if (typeof image === 'string') ExpoImage.prefetch(image);
+  }, [image]);
   
   // Determine image source: local or remote
   let imageSource = imageError
@@ -28,8 +33,8 @@ const Review = ({text,image,name,ratings}) => {
       borderColor: theme.border,
     }}>
       <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 12 }}>
-        <Image
-          source={imageSource}
+        <ExpoImage
+          source={imageError || !image ? placeholderImage : imageSource}
           style={{
             width: 50,
             height: 50,
@@ -38,8 +43,17 @@ const Review = ({text,image,name,ratings}) => {
             borderWidth: 2,
             borderColor: theme.border,
           }}
-          onError={() => setImageError(true)}
+          contentFit="cover"
+          placeholder={placeholderImage}
+          onLoadEnd={() => setLoading(false)}
+          onError={() => { setImageError(true); setLoading(false); }}
+          transition={300}
         />
+        {loading && (
+          <View style={{ position: 'absolute', left: 0, top: 0, width: 50, height: 50, backgroundColor: 'rgba(220,220,220,0.3)', borderRadius: 25, justifyContent: 'center', alignItems: 'center' }}>
+            <ExpoImage source={placeholderImage} style={{ width: 12, height: 12, opacity: 0.5 }} contentFit="cover" />
+          </View>
+        )}
         <View style={{ flex: 1 }}>
           <Text style={{
             fontSize: 16,

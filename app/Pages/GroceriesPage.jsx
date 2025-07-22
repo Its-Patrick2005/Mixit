@@ -510,25 +510,28 @@ const GroceriesPage = () => {
         style={{ paddingHorizontal: 16, marginTop: 16 }}
         contentContainerStyle={{ paddingBottom: 150 }}
       >
+        {/* Add Item button - always visible */}
+        <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 12 }}>
+          <TouchableOpacity
+            onPress={handleAddGrocery}
+            style={{ 
+              backgroundColor: theme.primaryGreen, 
+              paddingHorizontal: 12, 
+              paddingVertical: 6, 
+              borderRadius: 16,
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}
+          >
+            <Ionicons name="add" size={16} color="white" />
+            <Text style={{ color: 'white', fontSize: 14, fontWeight: 'bold', marginLeft: 4 }}>Add Item</Text>
+          </TouchableOpacity>
+        </View>
         {/* Market List Cards (if recipes are saved) */}
         {savedRecipes.length > 0 && (
           <View style={{ marginBottom: 24 }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
               <Text style={{ fontSize: 18, fontWeight: 'bold', color: theme.primaryText }}>Market Lists</Text>
-              <TouchableOpacity
-                onPress={handleAddGrocery}
-                style={{ 
-                  backgroundColor: theme.primaryGreen, 
-                  paddingHorizontal: 12, 
-                  paddingVertical: 6, 
-                  borderRadius: 16,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}
-              >
-                <Ionicons name="add" size={16} color="white" />
-                <Text style={{ color: 'white', fontSize: 14, fontWeight: 'bold', marginLeft: 4 }}>Add Item</Text>
-              </TouchableOpacity>
             </View>
             {savedRecipes.map((recipe, index) => (
               <TouchableOpacity

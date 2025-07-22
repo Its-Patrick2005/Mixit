@@ -1,6 +1,6 @@
 import { Foundation, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from 'expo-image-picker';
-import { useNavigation } from "expo-router";
 import { useState } from "react";
 import { Alert, Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
 import foodList from "../FoodData";
@@ -18,7 +18,6 @@ const ImportPopUp = ({ visible, onClose, onWriteFromScratch }) => {
 
   // Handle paste text search
   const handlePasteSubmit = () => {
-    console.log('Paste submit called with text:', pasteText);
     
     if (!pasteText.trim()) {
       setPasteError("Please enter a recipe name");
@@ -26,7 +25,6 @@ const ImportPopUp = ({ visible, onClose, onWriteFromScratch }) => {
     }
 
     const searchTerm = pasteText.trim().toLowerCase();
-    console.log('Searching for:', searchTerm);
     
     // Enhanced search algorithm
     const found = foodList.find(food => {
@@ -49,7 +47,6 @@ const ImportPopUp = ({ visible, onClose, onWriteFromScratch }) => {
     });
 
     if (found) {
-      console.log('Found recipe:', found.name);
       setPasteModalVisible(false);
       setPasteText("");
       setPasteError("");
@@ -67,14 +64,12 @@ const ImportPopUp = ({ visible, onClose, onWriteFromScratch }) => {
         }
       });
     } else {
-      console.log('No recipe found');
       setPasteError(`Recipe "${pasteText}" not found. Try: Pancakes, Omelette, French Toast`);
     }
   };
 
   // Handle food detected from scanner
   const handleFoodDetected = (detectedFood) => {
-    console.log('Food detected:', detectedFood);
     // Reset scanner state
     setScannerVisible(false);
     setCapturedImageUri(null);
@@ -85,7 +80,6 @@ const ImportPopUp = ({ visible, onClose, onWriteFromScratch }) => {
   // Handle camera press - directly open camera
   const handleCameraPress = async () => {
     try {
-      console.log('📸 Starting camera capture process...');
       
       // Reset any previous state first
       setCapturedImageUri(null);
@@ -100,14 +94,12 @@ const ImportPopUp = ({ visible, onClose, onWriteFromScratch }) => {
           [
             { text: 'Cancel', style: 'cancel' },
             { text: 'Open Settings', onPress: () => {
-              console.log('Should open device settings');
             }}
           ]
         );
         return;
       }
 
-      console.log('📸 Launching camera...');
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
@@ -116,68 +108,50 @@ const ImportPopUp = ({ visible, onClose, onWriteFromScratch }) => {
         base64: false,
       });
 
-      console.log('📸 Camera result:', result);
-
       if (!result.canceled && result.assets && result.assets[0] && result.assets[0].uri) {
-        console.log('✅ Image captured successfully:', result.assets[0].uri);
         
         // Set the captured image first
         setCapturedImageUri(result.assets[0].uri);
         
         // Open scanner immediately
-        console.log('🔍 Opening FoodScanner modal immediately...');
         setScannerVisible(true);
         
         // Close the import popup immediately
-        console.log('🔒 Closing ImportPopUp immediately...');
         onClose();
         
       } else {
-        console.log('❌ Camera cancelled or no image captured');
       }
     } catch (error) {
-      console.error('💥 Camera error:', error);
       Alert.alert('Error', 'Failed to open camera. Please try again.');
     }
   };
 
   // Handle scanner close
   const handleScannerClose = () => {
-    console.log('🔒 Closing FoodScanner modal');
     setScannerVisible(false);
     setCapturedImageUri(null);
   };
 
   // Handle write from scratch
   const handleWriteFromScratch = () => {
-    console.log('Navigating to UserInput');
     onClose();
     navigation.navigate("UserInput");
   };
 
   // Handle paste text - navigate to RecipeSearch page
   const handlePasteText = () => {
-    console.log('Navigating to RecipeSearch');
     onClose();
     navigation.navigate("RecipeSearch");
   };
 
   // Handle main popup close
   const handleClose = () => {
-    console.log('Closing ImportPopUp');
     setPasteModalVisible(false);
     setPasteText("");
     setPasteError("");
     setScannerVisible(false);
     onClose();
   };
-
-  // Debug logging for state changes
-  console.log('📊 ImportPopUp state:', { 
-    visible, 
-    scannerVisible, 
-    capturedImageUri: capturedImageUri ? 'has image' : 'no image' 
-  });
 
   return (
     <>

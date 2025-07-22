@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { View } from "react-native";
+import { useState } from 'react';
+import { ScrollView, View } from "react-native";
 import ImportTab from "../Components/ImportTab";
 import Navbar from "../Components/Navbar";
 import Search from "../Components/Search";
@@ -11,15 +11,15 @@ const RecipePage = ({ navigation }) => {
   const { theme } = useTheme();
 
   return (
-    <View style={{ backgroundColor: theme.primaryBackground, flex: 1, position: 'relative' }}>
+    <View style={{ flex: 1, backgroundColor: theme.primaryBackground }}>
       <Navbar />
-
-      <Search searchType="cookbooks" cookbooks={cookbooks} setCookbooks={setCookbooks} />
-
-      <Recipe cookbooks={cookbooks} setCookbooks={setCookbooks} />
-
+      <View style={{ zIndex: 10, backgroundColor: theme.primaryBackground }}>
+        <Search searchType="cookbooks" cookbooks={cookbooks} setCookbooks={setCookbooks} />
+      </View>
+      <ScrollView contentContainerStyle={{ paddingBottom: 80 }} showsVerticalScrollIndicator={false}>
+        <Recipe cookbooks={cookbooks} setCookbooks={setCookbooks} />
+      </ScrollView>
       <ImportTab currentPage="Recipe" />
-
     </View>
   );
 };

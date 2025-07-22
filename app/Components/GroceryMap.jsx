@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import { useEffect, useRef, useState } from 'react';
-import { Alert, Dimensions, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Dimensions, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import { useTheme } from '../theme.jsx';
 
@@ -22,58 +22,158 @@ const GroceryMap = ({ visible, onClose, recipeName }) => {
   const mapRef = useRef(null);
   const { theme } = useTheme();
 
+  // Helper to determine if a store is open based on its hours
+  function isStoreOpen(hours) {
+    if (!hours) return false;
+    // Example: "7:00 AM - 10:00 PM"
+    const now = new Date();
+    let [openStr, closeStr] = hours.split(' - ');
+    if (!openStr || !closeStr) return false;
+    // Parse times
+    const parseTime = (str) => {
+      const [time, meridian] = str.trim().split(' ');
+      let [h, m] = time.split(':').map(Number);
+      if (meridian.toUpperCase() === 'PM' && h !== 12) h += 12;
+      if (meridian.toUpperCase() === 'AM' && h === 12) h = 0;
+      return { h, m };
+    };
+    const { h: openH, m: openM } = parseTime(openStr);
+    const { h: closeH, m: closeM } = parseTime(closeStr);
+    const openDate = new Date(now);
+    openDate.setHours(openH, openM, 0, 0);
+    const closeDate = new Date(now);
+    closeDate.setHours(closeH, closeM, 0, 0);
+    // Handle overnight (close < open)
+    if (closeDate <= openDate) closeDate.setDate(closeDate.getDate() + 1);
+    if (now >= openDate && now <= closeDate) return true;
+    return false;
+  }
+
   // Sample grocery store data (in a real app, you'd use Google Places API)
   const sampleStores = [
     {
       id: 1,
-      name: "Fresh Market",
-      type: "Supermarket",
-      distance: "0.3 km",
-      rating: 4.5,
-      address: "123 Main Street",
-      coordinates: { latitude: 37.78825, longitude: -122.4324 },
-      open: true,
-      hours: "7:00 AM - 10:00 PM"
+      name: "KNUST Junction Mall",
+      type: "Mall",
+      distance: "1.5 km",
+      rating: 4.6,
+      address: "KNUST Junction, Kumasi, Ghana",
+      coordinates: { latitude: 6.6915, longitude: -1.5655 },
+      hours: "9:00 AM - 9:00 PM"
     },
     {
       id: 2,
-      name: "Organic Grocery",
-      type: "Organic Store",
-      distance: "0.7 km",
-      rating: 4.8,
-      address: "456 Oak Avenue",
-      coordinates: { latitude: 37.78925, longitude: -122.4334 },
-      open: true,
-      hours: "8:00 AM - 9:00 PM"
+      name: "Ayeduase Market",
+      type: "Open Market",
+      distance: "0.8 km",
+      rating: 4.4,
+      address: "Ayeduase, Kumasi, Ghana",
+      coordinates: { latitude: 6.6781, longitude: -1.5617 },
+      hours: "6:00 AM - 7:00 PM"
     },
     {
       id: 3,
-      name: "Local Mart",
-      type: "Convenience Store",
-      distance: "1.2 km",
-      rating: 4.2,
-      address: "789 Pine Road",
-      coordinates: { latitude: 37.78725, longitude: -122.4314 },
-      open: false,
-      hours: "6:00 AM - 11:00 PM"
+      name: "Tech Supermart",
+      type: "Supermarket",
+      distance: "2.2 km",
+      rating: 4.7,
+      address: "Tech Junction, Kumasi, Ghana",
+      coordinates: { latitude: 6.6935, longitude: -1.5731 },
+      hours: "8:00 AM - 10:00 PM"
     },
     {
       id: 4,
-      name: "Farm Fresh",
-      type: "Farmers Market",
-      distance: "1.8 km",
+      name: "Fresh Market",
+      type: "Supermarket",
+      distance: "1.0 km",
+      rating: 4.5,
+      address: "Ayeduase Road, Kumasi, Ghana",
+      coordinates: { latitude: 6.6802, longitude: -1.5599 },
+      hours: "7:00 AM - 10:00 PM"
+    },
+    {
+      id: 5,
+      name: "Sunset Plaza",
+      type: "Mall",
+      distance: "2.8 km",
+      rating: 4.3,
+      address: "Oduom, Kumasi, Ghana",
+      coordinates: { latitude: 6.6742, longitude: -1.5610 },
+      hours: "9:00 AM - 8:00 PM"
+    },
+    {
+      id: 6,
+      name: "Harbor Food Hall",
+      type: "Food Hall",
+      distance: "2.5 km",
+      rating: 4.9,
+      address: "Bomso, Kumasi, Ghana",
+      coordinates: { latitude: 6.6862, longitude: -1.5618 },
+      hours: "11:00 AM - 11:00 PM"
+    },
+    // --- Additional real locations ---
+    {
+      id: 7,
+      name: "MaxMart Supermarket",
+      type: "Supermarket",
+      distance: "2.3 km",
+      rating: 4.8,
+      address: "MaxMart, Tech Junction, Kumasi, Ghana",
+      coordinates: { latitude: 6.6939, longitude: -1.5737 },
+      hours: "8:00 AM - 10:00 PM"
+    },
+    {
+      id: 8,
+      name: "Melcom Plus Kumasi",
+      type: "Department Store",
+      distance: "5.5 km",
+      rating: 4.5,
+      address: "Melcom Plus, Ahodwo Roundabout, Kumasi, Ghana",
+      coordinates: { latitude: 6.6666, longitude: -1.6242 },
+      hours: "8:00 AM - 9:00 PM"
+    },
+    {
+      id: 9,
+      name: "Kumasi City Mall",
+      type: "Mall",
+      distance: "4.2 km",
       rating: 4.7,
-      address: "321 Market Street",
-      coordinates: { latitude: 37.79025, longitude: -122.4344 },
-      open: true,
-      hours: "6:00 AM - 8:00 PM"
+      address: "Asokwa, Kumasi, Ghana",
+      coordinates: { latitude: 6.6786, longitude: -1.6163 },
+      hours: "9:00 AM - 10:00 PM"
+    },
+    {
+      id: 10,
+      name: "Anloga Market",
+      type: "Open Market",
+      distance: "6.0 km",
+      rating: 4.2,
+      address: "Anloga Junction, Kumasi, Ghana",
+      coordinates: { latitude: 6.7012, longitude: -1.6015 },
+      hours: "6:00 AM - 7:00 PM"
+    },
+    {
+      id: 11,
+      name: "A-Life Supermarket",
+      type: "Supermarket",
+      distance: "1.2 km",
+      rating: 4.6,
+      address: "A-Life, Ayeduase, Kumasi, Ghana",
+      coordinates: { latitude: 6.6795, longitude: -1.5605 },
+      hours: "7:30 AM - 9:30 PM"
     }
   ];
+
+  // Add dynamic open/closed status based on hours
+  const storesWithOpenStatus = sampleStores.map(store => ({
+    ...store,
+    open: isStoreOpen(store.hours)
+  }));
 
   useEffect(() => {
     if (visible) {
       // Set stores immediately with default coordinates
-      setNearbyStores(sampleStores);
+      setNearbyStores(storesWithOpenStatus);
       // Get location in background (non-blocking)
       getCurrentLocation();
     }
@@ -107,7 +207,7 @@ const GroceryMap = ({ visible, onClose, recipeName }) => {
       }
 
       // Update store coordinates based on user location
-      const storesWithCoordinates = sampleStores.map((store, index) => ({
+      const storesWithCoordinates = storesWithOpenStatus.map((store, index) => ({
         ...store,
         coordinates: {
           latitude: currentLocation.coords.latitude + (Math.random() - 0.5) * 0.01,
@@ -306,62 +406,64 @@ const GroceryMap = ({ visible, onClose, recipeName }) => {
               <Ionicons name="locate" size={24} color={theme.primaryGreen} />
             </TouchableOpacity>
 
-            {/* Store List */}
-            <View style={[styles.storeList, { backgroundColor: theme.secondaryBackground }]}>
+            {/* Store List with Scroll */}
+            <View style={[styles.storeList, { backgroundColor: theme.secondaryBackground }]}> 
               <Text style={[styles.listTitle, { color: theme.primaryText }]}>Stores near you</Text>
-              {nearbyStores.map((store) => (
-                <TouchableOpacity
-                  key={store.id}
-                  style={[
-                    styles.storeItem, 
-                    { 
-                      backgroundColor: selectedStore?.id === store.id ? theme.lightGreen : theme.tertiaryBackground,
-                      borderColor: selectedStore?.id === store.id ? theme.primaryGreen : theme.borderLight,
-                    }
-                  ]}
-                  onPress={() => handleStorePress(store)}
-                >
-                  <View style={styles.storeInfo}>
-                    <View style={styles.storeHeader}>
-                      <Text style={[styles.storeName, { color: theme.primaryText }]}>{store.name}</Text>
-                      <View style={[styles.statusBadge, { backgroundColor: store.open ? theme.lightGreen : '#ffe6e6' }]}>
-                        <Text style={[styles.statusText, { color: store.open ? theme.primaryGreen : theme.error }]}>
-                          {store.open ? 'Open' : 'Closed'}
-                        </Text>
-                      </View>
-                    </View>
-                    <Text style={[styles.storeType, { color: theme.secondaryText }]}>{store.type}</Text>
-                    <View style={styles.storeDetails}>
-                      <Text style={[styles.storeDistance, { color: theme.primaryGreen }]}>{store.distance}</Text>
-                      <Text style={[styles.storeRating, { color: theme.secondaryText }]}>⭐ {store.rating}</Text>
-                    </View>
-                    <Text style={[styles.storeAddress, { color: theme.tertiaryText }]}>{store.address}</Text>
-                    <Text style={[styles.storeHours, { color: theme.tertiaryText }]}>{store.hours}</Text>
-                  </View>
+              <ScrollView style={{ maxHeight: 220 }} showsVerticalScrollIndicator={true}>
+                {nearbyStores.map((store) => (
                   <TouchableOpacity
+                    key={store.id}
                     style={[
-                      styles.directionsButton, 
+                      styles.storeItem, 
                       { 
-                        backgroundColor: showDirections && selectedStore?.id === store.id ? '#ffe6e6' : theme.lightGreen,
-                        borderColor: showDirections && selectedStore?.id === store.id ? theme.error : theme.primaryGreen,
+                        backgroundColor: selectedStore?.id === store.id ? theme.lightGreen : theme.tertiaryBackground,
+                        borderColor: selectedStore?.id === store.id ? theme.primaryGreen : theme.borderLight,
                       }
                     ]}
-                    onPress={() => showDirections && selectedStore?.id === store.id ? clearDirections() : getDirections(store)}
+                    onPress={() => handleStorePress(store)}
                   >
-                    <Ionicons 
-                      name={showDirections && selectedStore?.id === store.id ? "close-circle" : "navigate"} 
-                      size={20} 
-                      color={showDirections && selectedStore?.id === store.id ? theme.error : theme.primaryGreen} 
-                    />
-                    <Text style={[
-                      styles.directionsText, 
-                      { color: showDirections && selectedStore?.id === store.id ? theme.error : theme.primaryGreen }
-                    ]}>
-                      {showDirections && selectedStore?.id === store.id ? "Clear Route" : "Directions"}
-                    </Text>
+                    <View style={styles.storeInfo}>
+                      <View style={styles.storeHeader}>
+                        <Text style={[styles.storeName, { color: theme.primaryText }]}>{store.name}</Text>
+                        <View style={[styles.statusBadge, { backgroundColor: store.open ? theme.lightGreen : '#ffe6e6' }]}> 
+                          <Text style={[styles.statusText, { color: store.open ? theme.primaryGreen : theme.error }]}> 
+                            {store.open ? 'Open' : 'Closed'}
+                          </Text>
+                        </View>
+                      </View>
+                      <Text style={[styles.storeType, { color: theme.secondaryText }]}>{store.type}</Text>
+                      <View style={styles.storeDetails}>
+                        <Text style={[styles.storeDistance, { color: theme.primaryGreen }]}>{store.distance}</Text>
+                        <Text style={[styles.storeRating, { color: theme.secondaryText }]}>⭐ {store.rating}</Text>
+                      </View>
+                      <Text style={[styles.storeAddress, { color: theme.tertiaryText }]}>{store.address}</Text>
+                      <Text style={[styles.storeHours, { color: theme.tertiaryText }]}>{store.hours}</Text>
+                    </View>
+                    <TouchableOpacity
+                      style={[
+                        styles.directionsButton, 
+                        { 
+                          backgroundColor: showDirections && selectedStore?.id === store.id ? '#ffe6e6' : theme.lightGreen,
+                          borderColor: showDirections && selectedStore?.id === store.id ? theme.error : theme.primaryGreen,
+                        }
+                      ]}
+                      onPress={() => showDirections && selectedStore?.id === store.id ? clearDirections() : getDirections(store)}
+                    >
+                      <Ionicons 
+                        name={showDirections && selectedStore?.id === store.id ? "close-circle" : "navigate"} 
+                        size={20} 
+                        color={showDirections && selectedStore?.id === store.id ? theme.error : theme.primaryGreen} 
+                      />
+                      <Text style={[
+                        styles.directionsText, 
+                        { color: showDirections && selectedStore?.id === store.id ? theme.error : theme.primaryGreen }
+                      ]}>
+                        {showDirections && selectedStore?.id === store.id ? "Clear Route" : "Directions"}
+                      </Text>
+                    </TouchableOpacity>
                   </TouchableOpacity>
-                </TouchableOpacity>
-              ))}
+                ))}
+              </ScrollView>
             </View>
           </>
         )}
