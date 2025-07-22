@@ -1,15 +1,17 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import React, { useCallback, useMemo } from "react";
+import { Image as ExpoImage } from 'expo-image';
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  Image,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import FoodData from "../FoodData";
 import { useTheme } from '../theme.jsx';
+
+const placeholderImage = require('../../assets/images/Logo.png');
 
 const meals = {
   breakfast: {
@@ -38,6 +40,11 @@ const meals = {
 const FoodCard = ({ name, image }) => {
   const navigation = useNavigation();
   const { theme } = useTheme();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  useEffect(() => {
+    if (image) ExpoImage.prefetch(image);
+  }, [image]);
   
   return (
     <TouchableOpacity
@@ -63,10 +70,20 @@ const FoodCard = ({ name, image }) => {
           backgroundColor: theme.cardBackground,
         }}
       >
-        <Image
-          source={{ uri: image }}
-          style={{ width: "100%", height: "100%", resizeMode: "cover" }}
+        <ExpoImage
+          source={error || !image ? placeholderImage : { uri: image }}
+          style={{ width: "100%", height: "100%" }}
+          contentFit="cover"
+          placeholder={placeholderImage}
+          onLoadEnd={() => setLoading(false)}
+          onError={() => { setError(true); setLoading(false); }}
+          transition={300}
         />
+        {loading && (
+          <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(220,220,220,0.3)', justifyContent: 'center', alignItems: 'center' }}>
+            <ExpoImage source={placeholderImage} style={{ width: 16, height: 16, opacity: 0.5 }} />
+          </View>
+        )}
       </View>
       <Text
         style={{
@@ -87,6 +104,13 @@ const FoodCard = ({ name, image }) => {
 const FoodCards = () => {
   const { theme } = useTheme();
   
+  // Prefetch images for meals
+  useEffect(() => {
+    Object.values(meals).forEach(meal => {
+      if (meal.image) ExpoImage.prefetch(meal.image);
+    });
+  }, []);
+
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
       {Object.values(meals).map((meal, idx) => (
@@ -105,10 +129,17 @@ const FoodCards = () => {
 };
 
 // --------------------- Grid of Food Images ------------------------
-export const FoodCard2 = React.memo(() => {
+const FoodCard2Component = () => {
   const navigation = useNavigation();
   const { theme } = useTheme();
   
+  // Prefetch all food images for FoodCard2 and Detailedfoodlist
+  useEffect(() => {
+    FoodData.forEach(food => {
+      if (food.image) ExpoImage.prefetch(food.image);
+    });
+  }, []);
+
   const handleFoodPress = useCallback((food) => {
     navigation.navigate("MealCard", { 
       food: {
@@ -150,9 +181,12 @@ export const FoodCard2 = React.memo(() => {
             borderColor: theme.border,
           }}
         >
-          <Image
-            source={{ uri: food.image }}
-            style={{ width: "100%", height: "100%", resizeMode: "cover" }}
+          <ExpoImage
+            source={food.image ? { uri: food.image } : placeholderImage}
+            style={{ width: "100%", height: "100%" }}
+            contentFit="cover"
+            placeholder={placeholderImage}
+            transition={300}
           />
           
           {/* Gradient overlay for better text readability */}
@@ -239,7 +273,11 @@ export const FoodCard2 = React.memo(() => {
       </View>
     </ScrollView>
   );
-});
+};
+
+FoodCard2Component.displayName = "FoodCard2";
+
+export const FoodCard2 = React.memo(FoodCard2Component);
 
 // --------------------- Detailed Food List Page ------------------------
 export const Detailedfoodlist = React.memo(() => {
@@ -247,6 +285,13 @@ export const Detailedfoodlist = React.memo(() => {
   const navigation = useNavigation();
   const mealName = route.params?.mealName || "";
   const { theme } = useTheme();
+
+  // Prefetch all food images for FoodCard2 and Detailedfoodlist
+  useEffect(() => {
+    FoodData.forEach(food => {
+      if (food.image) ExpoImage.prefetch(food.image);
+    });
+  }, []);
 
   const filteredFoods = useMemo(() => {
     return FoodData.filter((food) =>
@@ -300,9 +345,12 @@ export const Detailedfoodlist = React.memo(() => {
             position: "relative",
           }}
         >
-          <Image
-            source={{ uri: food.image }}
-            style={{ width: "100%", height: "100%", resizeMode: "cover" }}
+          <ExpoImage
+            source={food.image ? { uri: food.image } : placeholderImage}
+            style={{ width: "100%", height: "100%" }}
+            contentFit="cover"
+            placeholder={placeholderImage}
+            transition={300}
           />
           
           {/* Gradient overlay for better text readability */}
@@ -412,6 +460,7 @@ export const Detailedfoodlist = React.memo(() => {
     </ScrollView>
   );
 });
+Detailedfoodlist.displayName = "Detailedfoodlist";
 
 // --------------------- Grid Layout Addable Card ------------------------
 export const FoodCard3 = ({ cardName, image = [], text, onPress, onLongPress }) => {
@@ -437,7 +486,7 @@ export const FoodCard3 = ({ cardName, image = [], text, onPress, onLongPress }) 
           {/* Left Large Image */}
           <View style={{ width: '50%', marginRight: 4, backgroundColor: theme.tertiaryBackground, borderRadius: 8, overflow: 'hidden' }}>
             {image[0] ? (
-              <Image
+              <ExpoImage
                 source={{ uri: image[0] }}
                 style={{ width: '100%', height: '100%' }}
                 resizeMode="cover"
@@ -451,7 +500,7 @@ export const FoodCard3 = ({ cardName, image = [], text, onPress, onLongPress }) 
           <View style={{ width: '48%', justifyContent: 'space-between' }}>
             <View style={{ height: '48%', backgroundColor: theme.tertiaryBackground, borderRadius: 8, overflow: 'hidden', marginBottom: 4 }}>
               {image[1] ? (
-                <Image
+                <ExpoImage
                   source={{ uri: image[1] }}
                   style={{ width: '100%', height: '100%' }}
                   resizeMode="cover"
@@ -462,7 +511,7 @@ export const FoodCard3 = ({ cardName, image = [], text, onPress, onLongPress }) 
             </View>
             <View style={{ height: '48%', backgroundColor: theme.tertiaryBackground, borderRadius: 8, overflow: 'hidden' }}>
               {image[2] ? (
-                <Image
+                <ExpoImage
                   source={{ uri: image[2] }}
                   style={{ width: '100%', height: '100%' }}
                   resizeMode="cover"

@@ -13,16 +13,26 @@ export function useSidebar() {
 export const SidebarUserContext = createContext({
   profileImage: null,
   setProfileImage: () => {},
+  name: '',
+  setName: () => {},
+  username: '',
+  setUsername: () => {},
 });
 
 export function SidebarUserProvider({ children }) {
   const [profileImage, setProfileImageState] = useState(null);
+  const [name, setNameState] = useState('Martin Afful');
+  const [username, setUsernameState] = useState('martinaafful2304992');
 
   useEffect(() => {
     (async () => {
       try {
         const uri = await AsyncStorage.getItem('profileImage');
         if (uri) setProfileImageState(uri);
+        const storedName = await AsyncStorage.getItem('profileName');
+        if (storedName) setNameState(storedName);
+        const storedUsername = await AsyncStorage.getItem('profileUsername');
+        if (storedUsername) setUsernameState(storedUsername);
       } catch (e) {}
     })();
   }, []);
@@ -38,8 +48,30 @@ export function SidebarUserProvider({ children }) {
     } catch (e) {}
   };
 
+  const setName = async (newName) => {
+    setNameState(newName);
+    try {
+      if (newName) {
+        await AsyncStorage.setItem('profileName', newName);
+      } else {
+        await AsyncStorage.removeItem('profileName');
+      }
+    } catch (e) {}
+  };
+
+  const setUsername = async (newUsername) => {
+    setUsernameState(newUsername);
+    try {
+      if (newUsername) {
+        await AsyncStorage.setItem('profileUsername', newUsername);
+      } else {
+        await AsyncStorage.removeItem('profileUsername');
+      }
+    } catch (e) {}
+  };
+
   return (
-    <SidebarUserContext.Provider value={{ profileImage, setProfileImage }}>
+    <SidebarUserContext.Provider value={{ profileImage, setProfileImage, name, setName, username, setUsername }}>
       {children}
     </SidebarUserContext.Provider>
   );

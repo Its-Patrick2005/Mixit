@@ -262,387 +262,386 @@ const MealPlanPage = ({ navigation }) => {
   return (
     <View style={{ flex: 1, backgroundColor: theme.primaryBackground }}>
       <Navbar />
-
-      {/* Header */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, marginTop: 8 }}>
-        <Text style={{ fontSize: 24, fontWeight: 'bold', color: theme.primaryText }}>Meal Plan</Text>
-
-        <View style={{ flexDirection: 'row', gap: 4 }}>
-          <TouchableOpacity onPress={() => navigation.navigate('Groceries')}>
-            <View style={{ backgroundColor: theme.lightGreen, borderRadius: 20, padding: 4 }}>
-              <Ionicons name="add-circle" size={28} color={theme.primaryGreen} />
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity>
-            <View style={{ backgroundColor: theme.tertiaryBackground, borderRadius: 20, padding: 4 }}>
-              <Ionicons name="ellipsis-horizontal" size={28} color={theme.primaryGreen} />
-            </View>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Date Range */}
-      <View style={{ alignItems: 'center', marginTop: 16, flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16 }}>
-        <TouchableOpacity 
-          onPress={goToPreviousWeek}
-          style={{ backgroundColor: theme.cardBackground, borderRadius: 20, padding: 8, shadowColor: theme.shadow, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 }}
-        >
-          <Ionicons name="chevron-back" size={24} color={theme.primaryGreen} />
-        </TouchableOpacity>
-
-        <View style={{ alignItems: 'center' }}>
-          <Text style={{ fontSize: 14, color: theme.primaryText, fontWeight: '500' }}>
-            {format(startDate, 'dd MMM yyyy')} - {format(endDate, 'dd MMM yyyy')}
-          </Text>
-          <Text style={{ fontSize: 12, color: theme.tertiaryText, marginTop: 4 }}>
-            Week {format(startDate, 'w')} of {format(startDate, 'yyyy')}
-          </Text>
-        </View>
-
-        <TouchableOpacity 
-          onPress={goToNextWeek}
-          style={{ backgroundColor: theme.cardBackground, borderRadius: 20, padding: 8, shadowColor: theme.shadow, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 }}
-        >
-          <Ionicons name="chevron-forward" size={24} color={theme.primaryGreen} />
-        </TouchableOpacity>
-      </View>
-
-      {/* Scrollable Days List */}
-      <ScrollView 
-        contentContainerStyle={{ paddingBottom: 150 }} 
-        style={{ paddingHorizontal: 16, marginTop: 16 }}
-        showsVerticalScrollIndicator={false}
-      >
-        {days.map((day, index) => {
-          const dayRecipes = getRecipesForDay(day);
-          return (
-            <View
-              key={index}
-              style={{ 
-                backgroundColor: theme.cardBackground, 
-                borderRadius: 12, 
-                padding: 16, 
-                marginBottom: 12, 
-                position: 'relative',
-                zIndex: activeMenu === index ? 100 : 0, 
-                elevation: activeMenu === index ? 20 : 1,
-                shadowColor: theme.shadow,
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.1,
-                shadowRadius: 4,
-                borderWidth: 1,
-                borderColor: theme.border,
-              }}
-            >
-              <Text style={{ fontWeight: '600', color: theme.primaryText, marginBottom: 12, fontSize: 18 }}>{day}</Text>
-              
-              {/* Meal slots */}
-              <View style={{ gap: 8 }}>
-                {[0, 1, 2].map((slotIndex) => {
-                  const recipe = dayRecipes[slotIndex];
-                  return (
-                    <View key={slotIndex} style={{ height: 48, backgroundColor: theme.tertiaryBackground, borderRadius: 8, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12 }}>
-                      {recipe ? (
-                        <TouchableOpacity 
-                          onPress={() => handleRecipePress(recipe)}
-                          onLongPress={() => removeRecipeFromDay(day, slotIndex)}
-                          style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}
-                        >
-                          <Image
-                            source={{ uri: recipe.image }}
-                            style={{
-                              width: 32,
-                              height: 32,
-                              borderRadius: 16,
-                              marginRight: 12,
-                            }}
-                          />
-                          <Text style={{ color: theme.primaryText, fontWeight: '500', flex: 1 }} numberOfLines={1}>
-                            {recipe.name}
-                          </Text>
-                          <Ionicons name="chevron-forward" size={16} color={theme.primaryGreen} />
-                        </TouchableOpacity>
-                      ) : (
-                        <Text style={{ color: theme.tertiaryText, fontSize: 14 }}>No meal planned</Text>
-                      )}
-                    </View>
-                  );
-                })}
+      <View style={{ backgroundColor: theme.primaryBackground, zIndex: 10 }}>
+        {/* Header */}
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, marginTop: 8 }}>
+          <Text style={{ fontSize: 24, fontWeight: 'bold', color: theme.primaryText }}>Meal Plan</Text>
+          <View style={{ flexDirection: 'row', gap: 4 }}>
+            <TouchableOpacity onPress={() => navigation.navigate('Groceries')}>
+              <View style={{ backgroundColor: theme.lightGreen, borderRadius: 20, padding: 4 }}>
+                <Ionicons name="add-circle" size={28} color={theme.primaryGreen} />
               </View>
-
-              <TouchableOpacity
-                style={{ position: 'absolute', right: 16, top: 16 }}
-                onPress={() => handleAddMeal(day)}
-              >
-                <Ionicons name="add-circle" size={32} color={theme.primaryGreen} />
-              </TouchableOpacity>
-
-              {activeMenu === index && !inNoteMode && !noteType && (
-                <View
-                  style={{ 
-                    position: 'absolute', 
-                    right: 64, 
-                    top: 16, 
-                    backgroundColor: theme.modalBackground, 
-                    borderRadius: 8, 
-                    padding: 12, 
-                    width: 208,
-                    zIndex: 110, 
-                    elevation: 30,
-                    shadowColor: theme.shadow,
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.2,
-                    shadowRadius: 8,
-                    borderWidth: 1,
-                    borderColor: theme.border,
-                  }}
-                >
-                  {mealTypes.map((type) => (
-                    <TouchableOpacity
-                      key={type}
-                      onPress={() => {
-                        if (type === 'Notes') {
-                          setInNoteMode(true);
-                        } else {
-                          alert(`${type} selected for ${day}`);
-                          resetAll();
-                        }
-                      }}
-                      style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: theme.borderLight }}
-                    >
-                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Text style={{ marginRight: 12, fontSize: 20 }}>{mealIcons[type]}</Text>
-                        <Text style={{ color: theme.primaryText, fontWeight: '500' }}>{type}</Text>
-                      </View>
-                      {type === 'Notes' && (
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                          <Ionicons name="folder" size={18} color={theme.primaryGreen} />
-                          <Ionicons name="chevron-forward" size={18} color={theme.primaryGreen} />
-                        </View>
-                      )}
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
-
-              {activeMenu === index && inNoteMode && !noteType && (
-                <View
-                  style={{ 
-                    position: 'absolute', 
-                    right: 64, 
-                    top: 16, 
-                    backgroundColor: theme.modalBackground, 
-                    borderRadius: 8, 
-                    padding: 12, 
-                    width: 208,
-                    zIndex: 110, 
-                    elevation: 30,
-                    shadowColor: theme.shadow,
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.2,
-                    shadowRadius: 8,
-                    borderWidth: 1,
-                    borderColor: theme.border,
-                  }}
-                >
-                  <Text style={{ fontSize: 12, fontWeight: '600', color: theme.tertiaryText, marginBottom: 8, paddingHorizontal: 4 }}>Notes Folder</Text>
-                  {noteItems.map((item) => (
-                    <TouchableOpacity
-                      key={item}
-                      onPress={() => setNoteType(item)}
-                      style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: theme.borderLight }}
-                    >
-                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Text style={{ marginRight: 12, fontSize: 20 }}>{mealIcons[item]}</Text>
-                        <Text style={{ color: theme.primaryText, fontWeight: '500' }}>{item}</Text>
-                      </View>
-                      <Ionicons name="folder" size={18} color={theme.primaryGreen} />
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
-
-              {activeMenu === index && noteType && (
-                <View style={{ marginTop: 12, backgroundColor: theme.tertiaryBackground, padding: 16, borderRadius: 8, borderWidth: 1, borderColor: theme.border }}>
-                  <Text style={{ color: theme.primaryText, marginBottom: 8, fontWeight: '500' }}>Note for {noteType}:</Text>
-                  <TextInput
-                    multiline
-                    placeholder="Enter note..."
-                    value={noteText}
-                    onChangeText={setNoteText}
-                    style={{
-                      backgroundColor: theme.inputBackground,
-                      borderRadius: 8,
-                      padding: 12,
-                      color: theme.primaryText,
-                      minHeight: 80,
-                      textAlignVertical: 'top',
-                      borderWidth: 1,
-                      borderColor: theme.border,
-                    }}
-                    placeholderTextColor={theme.inputPlaceholder}
-                  />
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 }}>
-                    <TouchableOpacity onPress={resetAll}>
-                      <Text style={{ color: theme.error }}>Cancel</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => {
-                      alert(`Note saved for ${noteType}`);
-                      resetAll();
-                    }}>
-                      <Text style={{ color: theme.primaryGreen, fontWeight: 'bold' }}>Save</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              )}
-            </View>
-          );
-        })}
-      </ScrollView>
-
-      {/* Meal Type Selection Modal */}
-      <Modal
-        visible={mealTypeModalVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setMealTypeModalVisible(false)}
-      >
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
-          <View style={{
-            backgroundColor: theme.modalBackground,
-            borderRadius: 20,
-            padding: 24,
-            width: '90%',
-            alignItems: 'center',
-            shadowColor: theme.shadow,
-            shadowOpacity: 0.2,
-            shadowRadius: 10,
-            elevation: 10,
-          }}>
-            <Text style={{ fontSize: 20, fontWeight: 'bold', color: theme.primaryText, marginBottom: 24 }}>
-              Select Meal Type for {selectedDayForMeal}
-            </Text>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: '100%' }}>
-              {['Breakfast', 'Lunch', 'Dinner'].map((mealType) => (
-                <TouchableOpacity
-                  key={mealType}
-                  onPress={() => handleMealTypeSelect(mealType)}
-                  style={{
-                    backgroundColor: theme.tertiaryBackground,
-                    paddingHorizontal: 16,
-                    paddingVertical: 8,
-                    borderRadius: 20,
-                    borderWidth: 1,
-                    borderColor: theme.border,
-                  }}
-                >
-                  <Text style={{ color: theme.primaryText, fontWeight: '500' }}>{mealType}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-            <TouchableOpacity onPress={() => setMealTypeModalVisible(false)} style={{ marginTop: 24 }}>
-              <Text style={{ color: theme.tertiaryText, fontSize: 16 }}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <View style={{ backgroundColor: theme.tertiaryBackground, borderRadius: 20, padding: 4 }}>
+                <Ionicons name="ellipsis-horizontal" size={28} color={theme.primaryGreen} />
+              </View>
             </TouchableOpacity>
           </View>
         </View>
-      </Modal>
+        {/* Date Range */}
+        <View style={{ alignItems: 'center', marginTop: 16, flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16 }}>
+          <TouchableOpacity 
+            onPress={goToPreviousWeek}
+            style={{ backgroundColor: theme.cardBackground, borderRadius: 20, padding: 8, shadowColor: theme.shadow, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 }}
+          >
+            <Ionicons name="chevron-back" size={24} color={theme.primaryGreen} />
+          </TouchableOpacity>
 
-      {/* Recipe Selection Modal */}
-      <Modal
-        visible={recipeModalVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setRecipeModalVisible(false)}
-      >
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
-          <View style={{
-            backgroundColor: theme.modalBackground,
-            borderRadius: 20,
-            padding: 24,
-            width: '90%',
-            maxHeight: '80%',
-            shadowColor: theme.shadow,
-            shadowOpacity: 0.2,
-            shadowRadius: 10,
-            elevation: 10,
-          }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <Text style={{ fontSize: 20, fontWeight: 'bold', color: theme.primaryText }}>
-                Select Recipe for {selectedMealType}
+          <View style={{ alignItems: 'center' }}>
+            <Text style={{ fontSize: 14, color: theme.primaryText, fontWeight: '500' }}>
+              {format(startDate, 'dd MMM yyyy')} - {format(endDate, 'dd MMM yyyy')}
+            </Text>
+            <Text style={{ fontSize: 12, color: theme.tertiaryText, marginTop: 4 }}>
+              Week {format(startDate, 'w')} of {format(startDate, 'yyyy')}
+            </Text>
+          </View>
+
+          <TouchableOpacity 
+            onPress={goToNextWeek}
+            style={{ backgroundColor: theme.cardBackground, borderRadius: 20, padding: 8, shadowColor: theme.shadow, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 }}
+          >
+            <Ionicons name="chevron-forward" size={24} color={theme.primaryGreen} />
+          </TouchableOpacity>
+        </View>
+      </View>
+      <ScrollView contentContainerStyle={{ paddingBottom: 80 }} showsVerticalScrollIndicator={false}>
+        {/* Scrollable Days List */}
+        <ScrollView 
+          contentContainerStyle={{ paddingBottom: 150 }} 
+          style={{ paddingHorizontal: 16, marginTop: 16 }}
+          showsVerticalScrollIndicator={false}
+        >
+          {days.map((day, index) => {
+            const dayRecipes = getRecipesForDay(day);
+            return (
+              <View
+                key={index}
+                style={{ 
+                  backgroundColor: theme.cardBackground, 
+                  borderRadius: 12, 
+                  padding: 16, 
+                  marginBottom: 12, 
+                  position: 'relative',
+                  zIndex: activeMenu === index ? 100 : 0, 
+                  elevation: activeMenu === index ? 20 : 1,
+                  shadowColor: theme.shadow,
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 4,
+                  borderWidth: 1,
+                  borderColor: theme.border,
+                }}
+              >
+                <Text style={{ fontWeight: '600', color: theme.primaryText, marginBottom: 12, fontSize: 18 }}>{day}</Text>
+                
+                {/* Meal slots */}
+                <View style={{ gap: 8 }}>
+                  {[0, 1, 2].map((slotIndex) => {
+                    const recipe = dayRecipes[slotIndex];
+                    return (
+                      <View key={slotIndex} style={{ height: 48, backgroundColor: theme.tertiaryBackground, borderRadius: 8, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12 }}>
+                        {recipe ? (
+                          <TouchableOpacity 
+                            onPress={() => handleRecipePress(recipe)}
+                            onLongPress={() => removeRecipeFromDay(day, slotIndex)}
+                            style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}
+                          >
+                            <Image
+                              source={{ uri: recipe.image }}
+                              style={{
+                                width: 32,
+                                height: 32,
+                                borderRadius: 16,
+                                marginRight: 12,
+                              }}
+                            />
+                            <Text style={{ color: theme.primaryText, fontWeight: '500', flex: 1 }} numberOfLines={1}>
+                              {recipe.name}
+                            </Text>
+                            <Ionicons name="chevron-forward" size={16} color={theme.primaryGreen} />
+                          </TouchableOpacity>
+                        ) : (
+                          <Text style={{ color: theme.tertiaryText, fontSize: 14 }}>No meal planned</Text>
+                        )}
+                      </View>
+                    );
+                  })}
+                </View>
+
+                <TouchableOpacity
+                  style={{ position: 'absolute', right: 16, top: 16 }}
+                  onPress={() => handleAddMeal(day)}
+                >
+                  <Ionicons name="add-circle" size={32} color={theme.primaryGreen} />
+                </TouchableOpacity>
+
+                {activeMenu === index && !inNoteMode && !noteType && (
+                  <View
+                    style={{ 
+                      position: 'absolute', 
+                      right: 64, 
+                      top: 16, 
+                      backgroundColor: theme.modalBackground, 
+                      borderRadius: 8, 
+                      padding: 12, 
+                      width: 208,
+                      zIndex: 110, 
+                      elevation: 30,
+                      shadowColor: theme.shadow,
+                      shadowOffset: { width: 0, height: 4 },
+                      shadowOpacity: 0.2,
+                      shadowRadius: 8,
+                      borderWidth: 1,
+                      borderColor: theme.border,
+                    }}
+                  >
+                    {mealTypes.map((type) => (
+                      <TouchableOpacity
+                        key={type}
+                        onPress={() => {
+                          if (type === 'Notes') {
+                            setInNoteMode(true);
+                          } else {
+                            alert(`${type} selected for ${day}`);
+                            resetAll();
+                          }
+                        }}
+                        style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: theme.borderLight }}
+                      >
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                          <Text style={{ marginRight: 12, fontSize: 20 }}>{mealIcons[type]}</Text>
+                          <Text style={{ color: theme.primaryText, fontWeight: '500' }}>{type}</Text>
+                        </View>
+                        {type === 'Notes' && (
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Ionicons name="folder" size={18} color={theme.primaryGreen} />
+                            <Ionicons name="chevron-forward" size={18} color={theme.primaryGreen} />
+                          </View>
+                        )}
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+
+                {activeMenu === index && inNoteMode && !noteType && (
+                  <View
+                    style={{ 
+                      position: 'absolute', 
+                      right: 64, 
+                      top: 16, 
+                      backgroundColor: theme.modalBackground, 
+                      borderRadius: 8, 
+                      padding: 12, 
+                      width: 208,
+                      zIndex: 110, 
+                      elevation: 30,
+                      shadowColor: theme.shadow,
+                      shadowOffset: { width: 0, height: 4 },
+                      shadowOpacity: 0.2,
+                      shadowRadius: 8,
+                      borderWidth: 1,
+                      borderColor: theme.border,
+                    }}
+                  >
+                    <Text style={{ fontSize: 12, fontWeight: '600', color: theme.tertiaryText, marginBottom: 8, paddingHorizontal: 4 }}>Notes Folder</Text>
+                    {noteItems.map((item) => (
+                      <TouchableOpacity
+                        key={item}
+                        onPress={() => setNoteType(item)}
+                        style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: theme.borderLight }}
+                      >
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                          <Text style={{ marginRight: 12, fontSize: 20 }}>{mealIcons[item]}</Text>
+                          <Text style={{ color: theme.primaryText, fontWeight: '500' }}>{item}</Text>
+                        </View>
+                        <Ionicons name="folder" size={18} color={theme.primaryGreen} />
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+
+                {activeMenu === index && noteType && (
+                  <View style={{ marginTop: 12, backgroundColor: theme.tertiaryBackground, padding: 16, borderRadius: 8, borderWidth: 1, borderColor: theme.border }}>
+                    <Text style={{ color: theme.primaryText, marginBottom: 8, fontWeight: '500' }}>Note for {noteType}:</Text>
+                    <TextInput
+                      multiline
+                      placeholder="Enter note..."
+                      value={noteText}
+                      onChangeText={setNoteText}
+                      style={{
+                        backgroundColor: theme.inputBackground,
+                        borderRadius: 8,
+                        padding: 12,
+                        color: theme.primaryText,
+                        minHeight: 80,
+                        textAlignVertical: 'top',
+                        borderWidth: 1,
+                        borderColor: theme.border,
+                      }}
+                      placeholderTextColor={theme.inputPlaceholder}
+                    />
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 }}>
+                      <TouchableOpacity onPress={resetAll}>
+                        <Text style={{ color: theme.error }}>Cancel</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={() => {
+                        alert(`Note saved for ${noteType}`);
+                        resetAll();
+                      }}>
+                        <Text style={{ color: theme.primaryGreen, fontWeight: 'bold' }}>Save</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )}
+              </View>
+            );
+          })}
+        </ScrollView>
+
+        {/* Meal Type Selection Modal */}
+        <Modal
+          visible={mealTypeModalVisible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setMealTypeModalVisible(false)}
+        >
+          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
+            <View style={{
+              backgroundColor: theme.modalBackground,
+              borderRadius: 20,
+              padding: 24,
+              width: '90%',
+              alignItems: 'center',
+              shadowColor: theme.shadow,
+              shadowOpacity: 0.2,
+              shadowRadius: 10,
+              elevation: 10,
+            }}>
+              <Text style={{ fontSize: 20, fontWeight: 'bold', color: theme.primaryText, marginBottom: 24 }}>
+                Select Meal Type for {selectedDayForMeal}
               </Text>
-              <TouchableOpacity onPress={() => setRecipeModalVisible(false)}>
-                <Ionicons name="close" size={24} color={theme.primaryText} />
+              <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: '100%' }}>
+                {['Breakfast', 'Lunch', 'Dinner'].map((mealType) => (
+                  <TouchableOpacity
+                    key={mealType}
+                    onPress={() => handleMealTypeSelect(mealType)}
+                    style={{
+                      backgroundColor: theme.tertiaryBackground,
+                      paddingHorizontal: 16,
+                      paddingVertical: 8,
+                      borderRadius: 20,
+                      borderWidth: 1,
+                      borderColor: theme.border,
+                    }}
+                  >
+                    <Text style={{ color: theme.primaryText, fontWeight: '500' }}>{mealType}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <TouchableOpacity onPress={() => setMealTypeModalVisible(false)} style={{ marginTop: 24 }}>
+                <Text style={{ color: theme.tertiaryText, fontSize: 16 }}>Cancel</Text>
               </TouchableOpacity>
             </View>
-
-            {/* Search Input */}
-            <TextInput
-              placeholder="Search recipes..."
-              value={recipeSearchQuery}
-              onChangeText={setRecipeSearchQuery}
-              style={{
-                borderWidth: 1,
-                borderColor: theme.borderLight,
-                borderRadius: 8,
-                padding: 12,
-                marginBottom: 16,
-                fontSize: 16,
-                backgroundColor: theme.inputBackground,
-                color: theme.primaryText,
-              }}
-              placeholderTextColor={theme.inputPlaceholder}
-            />
-
-            {/* Recipe List */}
-            <ScrollView style={{ maxHeight: 400 }}>
-              {getFilteredRecipes(selectedMealType).map((recipe) => (
-                <TouchableOpacity
-                  key={recipe.name}
-                  onPress={() => {
-                    addRecipeToDay(recipe);
-                    setRecipeModalVisible(false);
-                    setRecipeSearchQuery('');
-                  }}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    padding: 12,
-                    marginBottom: 8,
-                    backgroundColor: theme.tertiaryBackground,
-                    borderRadius: 12,
-                    borderWidth: 1,
-                    borderColor: theme.border,
-                  }}
-                >
-                  <Image
-                    source={{ uri: recipe.image }}
-                    style={{ width: 40, height: 40, borderRadius: 8, marginRight: 12 }}
-                  />
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 14, fontWeight: '600', color: theme.primaryText }}>
-                      {recipe.name}
-                    </Text>
-                    <Text style={{ fontSize: 12, color: theme.secondaryText }}>
-                      ⭐ {recipe.rating}
-                    </Text>
-                  </View>
-                  <Ionicons name="add-circle" size={20} color={theme.primaryGreen} />
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-
-            {getFilteredRecipes(selectedMealType).length === 0 && (
-              <View style={{ alignItems: 'center', padding: 20 }}>
-                <Text style={{ color: theme.tertiaryText, textAlign: 'center' }}>
-                  No {selectedMealType?.toLowerCase()} recipes found.
-                </Text>
-              </View>
-            )}
           </View>
-        </View>
-      </Modal>
+        </Modal>
 
+        {/* Recipe Selection Modal */}
+        <Modal
+          visible={recipeModalVisible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setRecipeModalVisible(false)}
+        >
+          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
+            <View style={{
+              backgroundColor: theme.modalBackground,
+              borderRadius: 20,
+              padding: 24,
+              width: '90%',
+              maxHeight: '80%',
+              shadowColor: theme.shadow,
+              shadowOpacity: 0.2,
+              shadowRadius: 10,
+              elevation: 10,
+            }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                <Text style={{ fontSize: 20, fontWeight: 'bold', color: theme.primaryText }}>
+                  Select Recipe for {selectedMealType}
+                </Text>
+                <TouchableOpacity onPress={() => setRecipeModalVisible(false)}>
+                  <Ionicons name="close" size={24} color={theme.primaryText} />
+                </TouchableOpacity>
+              </View>
+
+              {/* Search Input */}
+              <TextInput
+                placeholder="Search recipes..."
+                value={recipeSearchQuery}
+                onChangeText={setRecipeSearchQuery}
+                style={{
+                  borderWidth: 1,
+                  borderColor: theme.borderLight,
+                  borderRadius: 8,
+                  padding: 12,
+                  marginBottom: 16,
+                  fontSize: 16,
+                  backgroundColor: theme.inputBackground,
+                  color: theme.primaryText,
+                }}
+                placeholderTextColor={theme.inputPlaceholder}
+              />
+
+              {/* Recipe List */}
+              <ScrollView style={{ maxHeight: 400 }}>
+                {getFilteredRecipes(selectedMealType).map((recipe) => (
+                  <TouchableOpacity
+                    key={recipe.name}
+                    onPress={() => {
+                      addRecipeToDay(recipe);
+                      setRecipeModalVisible(false);
+                      setRecipeSearchQuery('');
+                    }}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      padding: 12,
+                      marginBottom: 8,
+                      backgroundColor: theme.tertiaryBackground,
+                      borderRadius: 12,
+                      borderWidth: 1,
+                      borderColor: theme.border,
+                    }}
+                  >
+                    <Image
+                      source={{ uri: recipe.image }}
+                      style={{ width: 40, height: 40, borderRadius: 8, marginRight: 12 }}
+                    />
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 14, fontWeight: '600', color: theme.primaryText }}>
+                        {recipe.name}
+                      </Text>
+                      <Text style={{ fontSize: 12, color: theme.secondaryText }}>
+                        ⭐ {recipe.rating}
+                      </Text>
+                    </View>
+                    <Ionicons name="add-circle" size={20} color={theme.primaryGreen} />
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+
+              {getFilteredRecipes(selectedMealType).length === 0 && (
+                <View style={{ alignItems: 'center', padding: 20 }}>
+                  <Text style={{ color: theme.tertiaryText, textAlign: 'center' }}>
+                    No {selectedMealType?.toLowerCase()} recipes found.
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
+        </Modal>
+
+      </ScrollView>
       <ImportTab currentPage="MealPlan" />
     </View>
   );

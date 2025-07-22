@@ -1,13 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from 'expo-router';
+import { useNavigation } from '@react-navigation/native';
 import { useState } from 'react';
 import {
-  Alert,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
+    Alert,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
 } from 'react-native';
 import foodList from '../FoodData';
 import { useTheme } from '../theme.jsx';

@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import {
   Alert,
   Dimensions,
-  Image,
   Modal,
   ScrollView,
   Text,
@@ -14,6 +13,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Image as ExpoImage } from 'expo-image';
 import ingredientsData from '../Ingredients';
 import { useTheme } from '../theme.jsx';
 
@@ -277,13 +277,12 @@ const MealCard = ({ route, navigation }) => {
           elevation: 8,
         }}
       >
-        <Image
-          source={{ uri: food.image }}
-          style={{
-            width: "100%",
-            height: "100%",
-            resizeMode: "cover",
-          }}
+        <ExpoImage
+          source={food.image ? { uri: food.image } : require("../../assets/images/Logo.png")}
+          style={{ width: "100%", height: "100%" }}
+          contentFit="cover"
+          placeholder={require("../../assets/images/Logo.png")}
+          transition={300}
         />
         {/* Gradient overlay for better text readability */}
         <View
@@ -349,9 +348,11 @@ const MealCard = ({ route, navigation }) => {
           justifyContent: 'center',
           overflow: 'hidden',
         }}>
-          <Image
+          <ExpoImage
             source={require("../../assets/images/Asset 4.png")}
-            style={{ width: 40, height: 40, resizeMode: 'contain' }}
+            style={{ width: 40, height: 40 }}
+            contentFit="contain"
+            transition={300}
           />
         </View>
       </View>
@@ -716,7 +717,7 @@ const MealCard = ({ route, navigation }) => {
               textAlign: 'center',
               lineHeight: 22,
             }}>
-              Select a day to add "{food.name}" to your meal plan
+              Select a day to add &quot;{food.name}&quot; to your meal plan
             </Text>
             
             <ScrollView 

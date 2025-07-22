@@ -1,9 +1,9 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import { useNavigation } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { Image, Text, TextInput, TouchableOpacity, View } from "react-native";
-// import OtpInput from "react-otp-input"; // Not compatible with React Native
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSidebarUser } from '../../sidebarContext';
 import Button from "../Components/Button";
 import OTPverification from "../Components/OTPverification";
 import { useTheme } from '../theme.jsx';
@@ -11,12 +11,12 @@ import { useTheme } from '../theme.jsx';
 const Login = () => {
   const navigation = useNavigation();
   const { theme } = useTheme();
-  const [username, setUsername] = useState("");
+  const { setUsername, setName } = useSidebarUser();
+  const [name, setNameInput] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [submitted, setSubmitted] = useState(false);
-
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -40,18 +40,21 @@ const Login = () => {
 
       <View style={{ width: "80%", marginTop: 32 }}>
         <TextInput
-          placeholder="Username"
+          placeholder="Name"
           placeholderTextColor={theme.inputPlaceholder}
-          value={username}
-          onChangeText={setUsername}
+          value={name}
+          onChangeText={setNameInput}
+          editable={true}
+          textContentType="name"
+          autoComplete="name"
           style={[styles.input, { 
             borderColor: theme.borderLight, 
             backgroundColor: theme.inputBackground,
             color: theme.primaryText 
           }]}
         />
-        {submitted && !username ? (
-          <Text style={{ color: theme.error }}>Username is required</Text>
+        {submitted && !name ? (
+          <Text style={{ color: theme.error }}>Name is required</Text>
         ) : null}
 
         <TextInput
@@ -61,6 +64,9 @@ const Login = () => {
           onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
+          editable={true}
+          textContentType="emailAddress"
+          autoComplete="email"
           style={[styles.input, { 
             borderColor: theme.borderLight, 
             backgroundColor: theme.inputBackground,
@@ -80,6 +86,9 @@ const Login = () => {
             value={password}
             onChangeText={setPassword}
             secureTextEntry={!showPassword}
+            editable={true}
+            textContentType="password"
+            autoComplete="password"
             style={[styles.input, { 
               borderColor: theme.borderLight, 
               backgroundColor: theme.inputBackground,
@@ -106,6 +115,9 @@ const Login = () => {
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry={!showConfirmPassword}
+            editable={true}
+            textContentType="password"
+            autoComplete="password"
             style={[styles.input, { 
               borderColor: theme.borderLight, 
               backgroundColor: theme.inputBackground,
@@ -127,16 +139,25 @@ const Login = () => {
 
         <Button
           title="Create Account"
-          onPress={() => {
+          onPress={async () => {
             setSubmitted(true);
             if (
-              username &&
+              name &&
               email &&
               isValidEmail(email) &&
               password &&
               confirmPassword
             ) {
-              navigation.navigate("Login1");
+              // Save to context and AsyncStorage
+              setUsername(email);
+              setName(name);
+              await AsyncStorage.setItem('profileUsername', email);
+              await AsyncStorage.setItem('profileName', name);
+              // Go to OTP screen, prevent back
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Login1', params: { email, name } }],
+              });
             }
           }}
         />
@@ -165,13 +186,25 @@ const Login = () => {
   );
 };
 
-export const Login1 = () => {
+export const Login1 = (props) => {
+  const { route = {} } = props;
   const navigation = useNavigation();
   const { theme } = useTheme();
+  const { setUsername, setName } = useSidebarUser();
   const [otp, setOtp] = useState("");
   const [showResend, setShowResend] = useState(false);
   const [timer, setTimer] = useState(30);
   const [canResend, setCanResend] = useState(false);
+  const [otpKey, setOtpKey] = useState(Date.now());
+  // Get email and name from params if present, fallback to empty string
+  const email = route?.params?.email || '';
+  const name = route?.params?.name || '';
+
+  // Remount OTP inputs after a short delay when screen is shown
+  useEffect(() => {
+    const timeout = setTimeout(() => setOtpKey(Date.now()), 300);
+    return () => clearTimeout(timeout);
+  }, [route?.params?.email, route?.params?.name]);
 
   // Timer effect
   useEffect(() => {
@@ -199,8 +232,20 @@ export const Login1 = () => {
       (async () => {
         try {
           await AsyncStorage.setItem('isLoggedIn', 'true');
+          if (email) {
+            setUsername(email);
+            await AsyncStorage.setItem('profileUsername', email);
+          }
+          if (name) {
+            setName(name);
+            await AsyncStorage.setItem('profileName', name);
+          }
         } catch (e) {}
-        navigation.navigate("Home");
+        // Reset navigation stack to Home
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Home' }],
+        });
       })();
     }
   }, [otp]);
@@ -216,7 +261,15 @@ export const Login1 = () => {
           resizeMode="contain"
         />
       </View>
-      <OTPverification value={otp} onChange={setOtp} />
+      {/* Dummy hidden input to break autofill chain */}
+      <TextInput
+        style={{ height: 0, width: 0, opacity: 0, position: 'absolute' }}
+        autoComplete="off"
+        importantForAutofill="no"
+        value=""
+        editable={false}
+      />
+      <OTPverification key={otpKey} value={otp} onChange={setOtp} />
       {!showResend && (
         <Button
           title="Verify"
@@ -274,7 +327,8 @@ export const Login1 = () => {
 export const Login2 = () => {
   const navigation = useNavigation();
   const { theme } = useTheme();
-  const [username, setUsername] = useState("");
+  const { setUsername, setName } = useSidebarUser();
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -293,18 +347,18 @@ export const Login2 = () => {
 
       <View style={{ width: "80%", marginTop: 32 }}>
         <TextInput
-          placeholder="Username"
+          placeholder="Email"
           placeholderTextColor={theme.inputPlaceholder}
-          value={username}
-          onChangeText={setUsername}
+          value={email}
+          onChangeText={setEmail}
           style={[styles.input, { 
             borderColor: theme.borderLight, 
             backgroundColor: theme.inputBackground,
             color: theme.primaryText 
           }]}
         />
-        {submitted && !username ? (
-          <Text style={{ color: theme.error }}>Username is required</Text>
+        {submitted && !email ? (
+          <Text style={{ color: theme.error }}>Email is required</Text>
         ) : null}
 
         <View style={{ position: "relative", marginBottom: 12 }}>
@@ -337,16 +391,26 @@ export const Login2 = () => {
           title="Log In"
           onPress={async () => {
             setSubmitted(true);
-            if (username && password) {
+            if (email && password) {
               try {
                 // Set login status to true
                 await AsyncStorage.setItem('isLoggedIn', 'true');
-                // Navigate to Home
-                navigation.navigate("Home");
+                setUsername(email);
+                await AsyncStorage.setItem('profileUsername', email);
+                // Optionally, load name from AsyncStorage if present
+                const storedName = await AsyncStorage.getItem('profileName');
+                if (storedName) setName(storedName);
+                // Reset navigation stack to Home
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: 'Home' }],
+                });
               } catch (error) {
                 console.log('Error saving login status:', error);
-                // Still navigate to Home even if saving fails
-                navigation.navigate("Home");
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: 'Home' }],
+                });
               }
             }
           }}

@@ -1,7 +1,7 @@
 import Foundation from '@expo/vector-icons/Foundation';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { useNavigation } from "expo-router";
+import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
 import { useTheme } from '../theme.jsx';
@@ -31,40 +31,32 @@ const ImportTab = ({ currentPage = "Home" }) => {
 
   const handleWriteFromScratch = () => {
     try {
-      console.log('ImportTab: Navigating to UserInput');
       setShowImportPopup(false);
       navigation.navigate("UserInput");
     } catch (error) {
-      console.error('ImportTab: Error navigating to UserInput:', error);
       Alert.alert('Error', 'Failed to open recipe editor. Please try again.');
     }
   };
 
   const handleAddButtonPress = () => {
     try {
-      console.log('ImportTab: Opening import popup');
       setShowImportPopup(true);
     } catch (error) {
-      console.error('ImportTab: Error opening import popup:', error);
       Alert.alert('Error', 'Failed to open import options. Please try again.');
     }
   };
 
   const handleCloseImportPopup = () => {
     try {
-      console.log('ImportTab: Closing import popup');
       setShowImportPopup(false);
     } catch (error) {
-      console.error('ImportTab: Error closing import popup:', error);
     }
   };
 
   const handleNavigation = (routeName) => {
     try {
-      console.log('ImportTab: Navigating to', routeName);
       navigation.navigate(routeName);
     } catch (error) {
-      console.error('ImportTab: Error navigating to', routeName, ':', error);
       Alert.alert('Error', `Failed to navigate to ${routeName}. Please try again.`);
     }
   };
@@ -107,7 +99,7 @@ const ImportTab = ({ currentPage = "Home" }) => {
           onPress={handleAddButtonPress}
         >
           <Ionicons name="add-circle-sharp" size={70} color={theme.primaryGreen} />
-          <Text style={{ fontSize: 14, color: theme.primaryText }}>Add</Text>
+          {/* <Text style={{ fontSize: 14, color: theme.primaryText }}>Add</Text> */}
         </TouchableOpacity>
         
         <TouchableOpacity 

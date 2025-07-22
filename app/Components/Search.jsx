@@ -1,13 +1,13 @@
 import { Fontisto } from "@expo/vector-icons";
-import { useNavigation } from "expo-router";
+import { useNavigation } from "@react-navigation/native";
+import { Image as ExpoImage } from 'expo-image';
 import { useState } from "react";
 import {
-  Image,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import foodList from "../FoodData";
 import { useTheme } from '../theme.jsx';
@@ -154,9 +154,12 @@ const Search = ({ searchType = "food", cookbooks = [], setCookbooks = () => {} }
                     borderWidth: 2,
                     borderColor: theme.primaryGreen,
                   }}>
-                    <Image
-                      source={{ uri: item.image }}
-                      style={{ width: '100%', height: '100%', resizeMode: 'cover' }}
+                    <ExpoImage
+                      source={item.image ? { uri: item.image } : require('../../assets/images/Logo.png')}
+                      style={{ width: '100%', height: '100%' }}
+                      contentFit="cover"
+                      placeholder={require('../../assets/images/Logo.png')}
+                      transition={300}
                     />
                   </View>
                 )}

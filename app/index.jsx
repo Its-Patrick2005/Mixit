@@ -14,15 +14,16 @@ import Login, { Login1, Login2 } from "./Pages/Login";
 import LoginPage from "./Pages/LoginPage";
 import MealPlanPage from "./Pages/MealPlanPage";
 import Onboarding, {
-    Onboard1,
-    Onboard2,
-    Onboard3,
-    Onboard4,
+  Onboard1,
+  Onboard2,
+  Onboard3,
+  Onboard4,
 } from "./Pages/Onboarding";
 import OnboardPage from "./Pages/Onboardpage";
 import { Recipe2, Recipe3 } from "./Pages/Recipe";
 import RecipePage from "./Pages/RecipePage";
 import Settings from "./Pages/Settings";
+
 import { ThemeProvider } from "./theme.jsx";
 
 const Stack = createNativeStackNavigator();
@@ -44,12 +45,9 @@ export default function Index() {
                 animationDuration: 200,
                 gestureEnabled: true,
                 gestureDirection: "horizontal",
-                // Performance optimizations
                 lazy: true,
                 lazyPlaceholder: () => null,
-                // Reduce memory usage
                 unmountOnBlur: false,
-                // Optimize transitions
                 transitionSpec: {
                   open: {
                     animation: 'timing',
@@ -68,6 +66,7 @@ export default function Index() {
               <Stack.Screen name="MealPlan" component={MealPlanPage} />
               <Stack.Screen name="Recipe" component={RecipePage} />
               <Stack.Screen name="Settings" component={Settings} />
+             
               <Stack.Screen name="Onboard1" component={Onboard1} />
               <Stack.Screen name="Onboarding" component={Onboarding} />
               <Stack.Screen name="Onboard2" component={Onboard2} />
